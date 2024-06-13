@@ -1,0 +1,12 @@
+PRIMITIVE FUNCTIONALITY: 
+    An application to spin up & spin down docker containers
+
+FEATURES:
+    - Continoues integration and continoues development (Zero downtime)
+    - Cheaper compute using aws spot fleet
+    - SSH access (paid add-on)
+    - Easier deployments
+
+PROBLEMS:
+    - TLS Certifictaes
+    - Domain names
