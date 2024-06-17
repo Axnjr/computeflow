@@ -18,8 +18,6 @@ sudo docker pull yeasy/simple-web
 sudo docker run -p 80:80 yeasy/simple-web:latest
 `;
 
-// --//--`;
-
     const credentials = {
         accessKeyId: process.env.AWS_ACCESS_KEY_ID as string,
         secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY as string,
