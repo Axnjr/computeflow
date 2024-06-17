@@ -48,7 +48,7 @@ sudo docker run -e VALIDATION_TOKEN=${key as string} -p 3000:3000 axnjr/ignition
     });
 
     const command = new RunInstancesCommand({
-        ImageId:"ami-001843b876406202a",//"ami-06041499d7ab7c387", 
+        ImageId:"ami-0e1d06225679bc1c5",//"ami-06041499d7ab7c387", 
         InstanceType:"t4g.micro",
         MinCount:1,
         MaxCount:1,
