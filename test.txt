@@ -10,3 +10,56 @@ FEATURES:
 PROBLEMS:
     - TLS Certifictaes
     - Domain names
+
+
+    // Import necessary classes from the AWS SDK
+    const { EC2Client, CreateFleetCommand } = require("@aws-sdk/client-ec2");
+    
+    // (Optional) Configure the AWS client with your credentials
+    // Replace 'YOUR_ACCESS_KEY_ID' and 'YOUR_SECRET_ACCESS_KEY' with your actual credentials
+    const config = {
+        region: "REGION_NAME", // Replace with your desired AWS region
+        credentials: {
+            accessKeyId: 'YOUR_ACCESS_KEY_ID',
+            secretAccessKey: 'YOUR_SECRET_ACCESS_KEY'
+        }
+    };
+    
+    const client = new EC2Client(config);
+    
+    // Define the fleet launch configuration
+    const input = {
+        DryRun: true, // Set to 'false' to actually create the fleet
+        ClientToken: "unique_token_123", // Replace with a unique identifier
+        SpotOptions: {
+            AllocationStrategy: "lowest-price", // Choose your Spot Instance allocation strategy
+            InstanceInterruptionBehavior: "terminate", // Action to take on Spot Instance interruption
+            MinTargetCapacity: 2, // Minimum number of instances in the fleet
+            MaxTotalPrice: "0.10", // Maximum hourly price for Spot Instances (adjust as needed)
+        },
+        // (Optional) Configure On-Demand Options if needed
+        // OnDemandOptions: {
+        //   ... similar structure to SpotOptions ...
+        // },
+        ExcessCapacityTerminationPolicy: "no-termination", // Policy for handling excess instances
+        LaunchTemplateConfigs: [
+            {
+                LaunchTemplateName: "your-launch-template-name", // Replace with your launch template name
+                WeightedCapacity: 1 // Allocate 100% of instances from this launch template
+            }
+        ]
+    };
+    
+    // Create the EC2 fleet using the configured client and input
+    const run = async () => {
+        try {
+            const command = new CreateFleetCommand(input);
+            await client.send(command);
+            console.log("Fleet creation request sent successfully!");
+        } catch (error) {
+            console.error("Error creating fleet:", error);
+        }
+    };
+    
+    run();
+    
