@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { EC2Client, RunInstancesCommand } from "@aws-sdk/client-ec2";
+import { EC2Client, RunInstancesCommand, DescribeInstancesCommand } from "@aws-sdk/client-ec2";
 
 export async function GET(req: NextRequest) {
 
     // const password = req?.nextUrl?.searchParams?.get("password")?.replace(/["\\/]/g, '');
-    // const key = req?.nextUrl?.searchParams?.get("key")?.replace(/["\\/]/g, '');
+    const url = req?.nextUrl?.searchParams?.get("url")?.replace(/["\\/]/g, '');
+    const runCommand = req?.nextUrl?.searchParams?.get("comm")?.replace(/["\\/]/g, '');
 
     // if(password != process.env.PASSWORD) {
         // return new NextResponse("Unauthorized", { status: 401 });
@@ -46,9 +47,19 @@ sudo docker run -p 80:80 yeasy/simple-web:latest
         const data = await ec2.send(command);
         // console.log(data)
         if(data.Instances) {
+            let VMDetails;
+
+            if(data.Instances[0].InstanceId){
+                const command = new DescribeInstancesCommand({InstanceIds:[data.Instances[0].InstanceId]});
+                VMDetails = await ec2.send(command);
+                console.log(VMDetails)
+            }
+
             return new NextResponse(JSON.stringify({
                 success: true,
-                data: data.Instances[0]
+                latest:true,
+                DETAILS:VMDetails,
+                data: data.Instances[0],
             }))
         }
     } catch (error) {
@@ -57,6 +68,24 @@ sudo docker run -p 80:80 yeasy/simple-web:latest
     }
     
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // Content-Type: multipart/mixed; boundary="//"
 // MIME-Version: 1.0
@@ -79,7 +108,6 @@ sudo docker run -p 80:80 yeasy/simple-web:latest
 
 // sudo docker pull axnjr/ignition_wssd:1
 // sudo docker run -e VALIDATION_TOKEN=${key as string} -p 3000:3000 axnjr/ignition_wssd:1
-
 /**
  * sudo rm -rf /var/lib/cloud/*
 sudo cloud-init init
