@@ -2,15 +2,6 @@
 
 export default function Home() {
 
-	async function intiateDeployement(formData: FormData) {
-		'use server'
-		const url = formData.get('url')
-		return new Response(JSON.stringify({
-			data: `Deployement initiated for ${url}`
-		}), {
-			status: 200
-		})
-	}
 
 		return (
 			<>
