@@ -26,7 +26,8 @@ export default async function Nav() {
 
 
     return (
-        <nav className="h-16 w-full border-b flex items-center gap-4 justify-between border-neutral-800 px-5">
+        <nav className="h-20 w-full border-b flex items-center gap-4 justify-between dark:border-neutral-800 
+        px-6 dark:bg-black bg-white dark:text-white text-black">
             <div className='flex items-center gap-1'>
                 <svg className="size-6" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" >
                     <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15a4.5 4.5 0 0 0 4.5 4.5H18a3.75 3.75 0 0 0 1.332-7.257 3 3 0 0 0-3.758-3.848 5.25 5.25 0 0 0-10.233 2.33A4.502 4.502 0 0 0 2.25 15Z" />
@@ -48,54 +49,34 @@ export default async function Nav() {
                     <DropdownMenuTrigger asChild>
                         <Avatar className='w-8 h-8'>
                             <AvatarImage src={auth?.user?.image as string} />
-                            <AvatarFallback>CN</AvatarFallback>
                         </Avatar>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-56">
-                        <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuGroup>
-                            <DropdownMenuItem>
-                                Profile
-                                <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                                Billing
-                                <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                                Settings
-                                <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                                Keyboard shortcuts
-                                <DropdownMenuShortcut>⌘K</DropdownMenuShortcut>
-                            </DropdownMenuItem>
-                        </DropdownMenuGroup>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuGroup>
-                            <DropdownMenuItem>Team</DropdownMenuItem>
-                            <DropdownMenuSub>
-                                <DropdownMenuSubTrigger>Invite users</DropdownMenuSubTrigger>
-                                <DropdownMenuPortal>
-                                    <DropdownMenuSubContent>
-                                        <DropdownMenuItem>Email</DropdownMenuItem>
-                                        <DropdownMenuItem>Message</DropdownMenuItem>
-                                        <DropdownMenuSeparator />
-                                        <DropdownMenuItem>More...</DropdownMenuItem>
-                                    </DropdownMenuSubContent>
-                                </DropdownMenuPortal>
-                            </DropdownMenuSub>
-                            <DropdownMenuItem>
-                                New Team
-                                <DropdownMenuShortcut>⌘+T</DropdownMenuShortcut>
-                            </DropdownMenuItem>
-                        </DropdownMenuGroup>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem>GitHub</DropdownMenuItem>
-                        <DropdownMenuItem>Support</DropdownMenuItem>
-                        <DropdownMenuItem disabled>API</DropdownMenuItem>
-                        <DropdownMenuSeparator />
+                    <DropdownMenuContent className="w-56 px-2 py-3 mr-6 mt-3">
+                        <DropdownMenuItem> 
+                            Profile
+                            <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+                        </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                        <DropdownMenuItem>
+                            Themes
+                            <DropdownMenuShortcut>
+                                <Modes/>
+                            </DropdownMenuShortcut>
+                        </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                        <DropdownMenuItem>
+                            Billing
+                            <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                            Settings
+                            <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                            Invite User
+                            <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
+                        </DropdownMenuItem>
+                            <DropdownMenuSeparator />
                         <DropdownMenuItem>
                             Log out
                             <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
