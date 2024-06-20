@@ -1,0 +1,6 @@
+{
+  "databaseURL": "https://yakshit-chhipa-s-workspace-p8bvk5.eu-central-1.xata.sh/db/cheapcloud",
+  "codegen": {
+    "output": "src/xata.ts"
+  }
+}
