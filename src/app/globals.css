@@ -21,3 +21,8 @@
     text-wrap: balance;
   }
 }
+
+::selection{
+  background-color: yellow;
+  color: black;
+}
