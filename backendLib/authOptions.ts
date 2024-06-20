@@ -4,7 +4,7 @@ import GithubProvider from 'next-auth/providers/github'
 import { XataAdapter } from "@auth/xata-adapter"
 import { XataClient } from "@/xata"
 
-export const { handlers, signIn, signOut, auth } = NextAuth({
+export const authConfig = {
 	adapter: XataAdapter(new XataClient()),
 	providers: [
 		GoogleProvider({
@@ -16,4 +16,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 			clientSecret: process.env.GITHUB_CLIENT_SECRET!,
 		})
 	],
-})
+}
+
+export const { handlers, signIn, signOut, auth } = NextAuth(authConfig)
