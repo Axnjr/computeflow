@@ -1,42 +1,32 @@
 import getServerSession from 'next-auth'
 import { authConfig } from '../../backendLib/authOptions';
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import Modes from './ui/modes';
+import { Avatar, AvatarImage } from "@/components/ui/avatar"
 import {
     DropdownMenu,
     DropdownMenuContent,
-    DropdownMenuGroup,
     DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuPortal,
     DropdownMenuSeparator,
     DropdownMenuShortcut,
-    DropdownMenuSub,
-    DropdownMenuSubContent,
-    DropdownMenuSubTrigger,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Button } from "@/components/ui/button"
 
 export default async function Nav() {
 
     const session = getServerSession(authConfig);
     const auth = await session.auth();
 
-
-
     return (
-        <nav className="h-20 w-full border-b flex items-center gap-4 justify-between dark:border-neutral-800 
+        <nav className="h-20 w-full flex border-b items-center gap-4 justify-between dark:border-neutral-800 
         px-6 dark:bg-black bg-white dark:text-white text-black">
-            <div className='flex items-center gap-1'>
-                <svg className="size-6" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" >
+            <a href='/overview' className='flex items-center gap-1'>
+                {/* <h3 className='text-xl font-medium tracking-tighter'>computeflow</h3> */}
+                <svg className="size-7 fill-sky-500" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" viewBox="0 0 24 24" >
                     <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15a4.5 4.5 0 0 0 4.5 4.5H18a3.75 3.75 0 0 0 1.332-7.257 3 3 0 0 0-3.758-3.848 5.25 5.25 0 0 0-10.233 2.33A4.502 4.502 0 0 0 2.25 15Z" />
                 </svg>
-                <h3 className='text-xl tracking-tighter'>CheapCloud</h3>
-                <h3 className='text-2x mx-2 text-neutral-300 dark:text-neutral-800'>⁄</h3>
+                <h3 className='text-2xl mx-2 text-neutral-300 dark:text-neutral-700'>⁄</h3>
                 <div className=' rounded-full w-5 h-5 bg-gradient-to-br from-sky-400 to-amber-400 mr-1'></div>
                 <h3 className='text-base tracking-tighter'>{auth?.user?.name}'s dashboard</h3>
-            </div>
+            </a>
             <div className='flex items-center gap-4 text-sm'>
                 <p>Feedback</p>
                 <p>Docs</p>
@@ -55,13 +45,6 @@ export default async function Nav() {
                         <DropdownMenuItem> 
                             Profile
                             <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
-                        </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                        <DropdownMenuItem>
-                            Themes
-                            <DropdownMenuShortcut>
-                                <Modes/>
-                            </DropdownMenuShortcut>
                         </DropdownMenuItem>
                             <DropdownMenuSeparator />
                         <DropdownMenuItem>
