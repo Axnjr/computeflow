@@ -77,10 +77,10 @@ const tables = [
       { name: "project_name", type: "string", unique: true },
       { name: "ip", type: "string", unique: true },
       { name: "user", type: "link", link: { table: "nextauth_users" } },
-      { name: "last_deployed", type: "datetime" },
       { name: "status", type: "string" },
       { name: "region", type: "string" },
       { name: "runtime", type: "string" },
+      { name: "deployed_from", type: "string" }
     ],
   },
 ] as const;
