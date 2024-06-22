@@ -4,24 +4,8 @@ import { Button } from './ui/button'
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Project } from '@/types/types';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuShortcut,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import NewProjectDrawer from './newProjectDrawer';
-
-function monthsPassed(dateString: string) {
-    const givenDate = new Date(dateString);
-    const currentDate = new Date();
-    const yearsDifference = currentDate.getFullYear() - givenDate.getFullYear();
-    const monthsDifference = currentDate.getMonth() - givenDate.getMonth();
-    const totalMonthsPassed = yearsDifference * 12 + monthsDifference;
-    return totalMonthsPassed == 0 ? "in this month" : totalMonthsPassed;
-}
+import { monthsPassed } from '@/lib/utils';
 
 export default function Projects({ userProjects }: { userProjects: string }) {
 
@@ -55,7 +39,7 @@ export default function Projects({ userProjects }: { userProjects: string }) {
                     pros.length > 0
                         ?
                         pros.map((project: Project, id: number) => <Link href={`/${project.id}`} className='h-36 border rounded-xl 
-                    border-neutral-200 dark:border-neutral-800 p-5' key={id}>
+                        border-neutral-200 dark:border-neutral-800 p-5' key={id}>
                             <div className='flex items-top justify-between'>
                                 <h1 className='text-xl font-medium tracking-tighter capitalize block leading-0'>
                                     {project.project_name}<br />
@@ -77,10 +61,10 @@ export default function Projects({ userProjects }: { userProjects: string }) {
                             </div>
                         </Link>)
                         :
-                        <div className='text-center place-content-center place-items-center col-span-3'>
-                            <h1>No result found!</h1>
-                            <p><span className=' text-yellow-400 underline'>Create a project</span> named "{sp.get("q")}" ?</p>
-                        </div>
+                    <div className='text-center place-content-center place-items-center col-span-3'>
+                        <h1>No result found!</h1>
+                        <p><span className=' text-yellow-400 underline'>Create a project</span> named "{sp.get("q")}" ?</p>
+                    </div>
                 }
             </div>
         </>
