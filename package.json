@@ -10,7 +10,6 @@
     "xata:codegen": "npx @xata.io/cli@latest codegen"
   },
   "dependencies": {
-    "@apollo/client": "^3.10.6",
     "@auth/xata-adapter": "^1.2.0",
     "@aws-sdk/client-ec2": "^3.596.0",
     "@octokit/rest": "^21.0.0",
@@ -23,7 +22,6 @@
     "@xata.io/client": "^0.29.5",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
-    "graphql": "^16.9.0",
     "next": "14.2.4",
     "next-auth": "^5.0.0-beta.19",
     "next-client-cookies": "^1.1.1",
