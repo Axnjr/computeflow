@@ -1,6 +1,6 @@
 import NextAuth, { type DefaultSession } from "next-auth"
-import GoogleProvider from 'next-auth/providers/google'
 import GithubProvider from 'next-auth/providers/github'
+import GitLab from "next-auth/providers/gitlab"
 import { XataAdapter } from "@auth/xata-adapter"
 import { XataClient } from "@/xata"
 
@@ -9,14 +9,12 @@ const xata = new XataClient()
 export const authConfig = {
 	adapter: XataAdapter(xata),
 	providers: [
-		GoogleProvider({
-			clientId: process.env.GOOGLE_CLIENT_ID!,
-			clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-		}),
-		GithubProvider({
-			clientId: process.env.GITHUB_CLIENT_ID!,
-			clientSecret: process.env.GITHUB_CLIENT_SECRET!,
-		})
+		GitLab,
+		GithubProvider
+		// ({
+		// 	clientId: process.env.GITHUB_CLIENT_ID!,
+		// 	clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+		// })
 	],
 	callbacks: {
 		// @ts-ignore
