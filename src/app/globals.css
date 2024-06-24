@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: "hk";
+  src: url(./3534416bbfdcc9be-s.p.woff2);
+}
+
 :root {
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
@@ -25,4 +30,18 @@
 ::selection{
   background-color: yellow;
   color: black;
+}
+
+::-webkit-scrollbar{
+  width: 5px;
+  height: 5px;
+  background-color: var(--background-end-rgb);
+}
+
+::-webkit-scrollbar-thumb{
+  background-color: var(--foreground-rgb);
+}
+
+body{
+  font-family: "hk";
 }
