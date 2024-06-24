@@ -1,5 +1,5 @@
 "use client";
-import { ExternalLinkIcon, GitHubLogoIcon, InfoCircledIcon } from '@radix-ui/react-icons';
+import { CheckCircledIcon, ExternalLinkIcon, GitHubLogoIcon, InfoCircledIcon } from '@radix-ui/react-icons';
 import { monthsPassed } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 import useGitRepos from '@/hooks/useGitRepos';
@@ -17,6 +17,55 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
+
+const features = [
+    "Zero Downtime",
+    "Auto deployments",
+    "Support for persistant disks",
+    "SSH Access",
+    "Logs & metrics",
+    "Scaling",
+    "Instant Rollbacks"
+]
+
+const plans = [
+    {
+        name:"Hobby", // t4g nano = 6$
+        price:8,
+        ram:"512 MB",
+        cpu:2
+    },
+    {
+        name:"Basic", //  t4g small = 8$
+        price:15,
+        ram:"2 GB",
+        cpu:2
+    },
+    {
+        name:"Plus", // t4g medium = 16$
+        price:30,
+        ram:"4 GB",
+        cpu:2
+    },
+    {
+        name:"Pro", // c6g extra large = 62$
+        price:75,
+        ram:"8 GB",
+        cpu:4
+    },
+    {
+        name:"Extra", // t4g extra large = 65$
+        price:99,
+        ram:"16 GB",
+        cpu:4
+    },
+    {
+        name:"Extra Pro", // t4g double extra large = 130$
+        price:150,
+        ram:"32 GB",
+        cpu:8
+    },
+]
 
 export default function DeployViaGithub() {
 
@@ -171,24 +220,34 @@ export default function DeployViaGithub() {
                     </div>
                 </div>
             </section>
-            <div className='w-[96%] rounded-lg m-auto border p-8 border-neutral-200 dark:border-neutral-800'>
+            <div className='w-[96%] rounded-lg m-auto border-2 p-8 border-neutral-200 dark:border-neutral-800'>
                 <h1 className='text-xl  font-semibold m-2'>Select compute type</h1>
-                <div className='flex items-center justify-between gap-2'>
-                    <div className='mx-2'>
-                        <h1 className='font-semibold '>All compute instnces support:</h1>
-                        <ul >
-                            <li>Zero downtime</li>
-                            <li>Auto deployemnt</li>
-                            <li>Instant rollbacks</li>
-                            <li>Scaling</li>
-                            <li>Logs</li>
-                            <li>SSH access</li>
+                <div className='flex items-center justify-between gap-2 h-full'>
+                    <div className='w-[25%] mx-2'>
+                        <ul>
+                           {
+                                features.map((feature, id) => <li key={id} className='flex items-center gap-2 font-medium'>
+                                    <CheckCircledIcon/> {feature}
+                                </li>)
+                           } 
                         </ul>
+                    </div>
+                    <div className='grid grid-cols-3 w-[75%] h-full gap-2'>
+                        {
+                            plans.map((plan, id) => <div key={id} className='border-2 border-neutral-200 dark:border-neutral-800 col-span-1 rounded-lg h-24 p-4
+                            flex items-end justify-between'>
+                                <div>
+                                    <p className='font-medium text-neutral-500'>{plan.name}</p>
+                                    <h1 className='text-xl font-bold'>${plan.price}<span className='text-xs font-light'> / Month</span></h1>
+                                </div>
+                                <p className='font-bold text-sm text-neutral-500'>{plan.cpu}vCPU · {plan.ram}(RAM)</p>
+                            </div>)
+                        }
                     </div>
                 </div>
             </div>
             <br/>
-            <div className='w-[96%] rounded-lg m-auto border p-8 border-neutral-200 dark:border-neutral-800'>
+            <div className='w-[96%] rounded-lg m-auto border-2 p-8 border-neutral-200 dark:border-neutral-800'>
                 <h1 className='text-xl  font-semibold m-2'>Enviroment variables</h1>
                 <div className='m-2 text-neutral-500'>
                     Your project secrets will be safe here. Copy paste your .env file here. Please add a semi-colon at end the of each value for simpler .env parsing.
