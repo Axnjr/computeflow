@@ -1,6 +1,6 @@
 import { Octokit } from "@octokit/rest";
 import { useSession } from "next-auth/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 export default function useGitRepos() {
 
@@ -8,9 +8,19 @@ export default function useGitRepos() {
     const [repos, setRepos] = useState<any[]>([])
     const [repos2, setRepos2] = useState<any[]>([])
     const [loading, setLoading] = useState<any>(true)
-    
+    const cache = useRef<any[]>([]);
+
     useEffect(() => {
         const fetchRepos = async () => {
+
+            if (cache.current.length > 0) {
+                setRepos([...cache.current]);
+                setRepos2([...cache.current]);
+                setLoading(false);
+                console.log("CACHE HIT !!")
+                return;
+            }
+
             let allRepos: React.SetStateAction<any[]> = [];
             let repoPage = 1;
             try {
@@ -37,12 +47,14 @@ export default function useGitRepos() {
                         name: repo.name,
                         url: repo.html_url,
                         pushed_at: repo.pushed_at,
+                        lang: repo.language
                     }));
 
                     allRepos = [...allRepos, ...simplifiedRepos];
                     repoPage += 1;
                 }
 
+                cache.current = [...allRepos];  // Cache the fetched results
                 setRepos([...allRepos]);
                 setRepos2([...allRepos]);
                 setLoading(false);
