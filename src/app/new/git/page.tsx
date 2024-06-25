@@ -1,75 +1,19 @@
 "use client";
-import { CheckCircledIcon, ExternalLinkIcon, GitHubLogoIcon, InfoCircledIcon } from '@radix-ui/react-icons';
-import { monthsPassed } from '@/lib/utils';
-import { useRouter } from 'next/navigation';
+import UserGitRepos from '@/components/gitRepos';
 import useGitRepos from '@/hooks/useGitRepos';
+import { ExternalLinkIcon } from '@radix-ui/react-icons';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from "@/components/ui/tooltip";
-
-const features = [
-    "Zero Downtime",
-    "Auto deployments",
-    "Support for persistant disks",
-    "SSH Access",
-    "Logs & metrics",
-    "Scaling",
-    "Instant Rollbacks"
-]
-
-const plans = [
-    {
-        name:"Hobby", // t4g nano = 6$
-        price:8,
-        ram:"512 MB",
-        cpu:2
-    },
-    {
-        name:"Basic", //  t4g small = 8$
-        price:15,
-        ram:"2 GB",
-        cpu:2
-    },
-    {
-        name:"Plus", // t4g medium = 16$
-        price:30,
-        ram:"4 GB",
-        cpu:2
-    },
-    {
-        name:"Pro", // c6g extra large = 62$
-        price:75,
-        ram:"8 GB",
-        cpu:4
-    },
-    {
-        name:"Extra", // t4g extra large = 65$
-        price:99,
-        ram:"16 GB",
-        cpu:4
-    },
-    {
-        name:"Extra Pro", // t4g double extra large = 130$
-        price:150,
-        ram:"32 GB",
-        cpu:8
-    },
-]
+import { useState } from 'react';
+import ProjectConfig from '@/components/projectConfig';
+import SelectCompute from '@/components/selectCompute';
+import EnvVariable from '@/components/envVariable';
 
 export default function DeployViaGithub() {
 
     const { repos, repos2, loading, setRepos, setLoading } = useGitRepos()
+    const [pro, setPro] = useState<typeof repos[0] | undefined>(undefined)
+    const [compute, setCompute] = useState("")
     const router = useRouter()
 
     function showSearchedProject(e: React.ChangeEvent<HTMLInputElement>) {
@@ -89,7 +33,7 @@ export default function DeployViaGithub() {
     let name = repos[0]?.url?.replace("https://github.com/", "").split("/")[0];
 
     return (
-        <main className="h-fit w-full dark:bg-black bg-white dark:text-white text-black">
+        <main className="h-fit w-full dark:bg-black bg-white dark:text-white text-black pb-12">
             <div className="w-full border-b p-8 border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950
             flex items-center justify-between">
                 <h1 className="text-4xl tracking-tight font-semibold leading-[3.5rem] w-1/2">
@@ -100,162 +44,39 @@ export default function DeployViaGithub() {
                         every commit to your linked branch with zero-downtime & instant rollbacks.
                     </div>
                 </h1>
-                <div className='flex items-center gap-2'>
-                    <Button variant="ghost">{repos.length} Repositories</Button>
-                    <Button>
-                        <a className='flex items-center' href={"https://github.com/" + name}>{name} <ExternalLinkIcon /></a>
-                    </Button>
-                </div>
+                {
+                    !loading 
+                        ? 
+                    <div className='flex items-center gap-2'>
+                        <Button variant="ghost">{repos.length} Repositories</Button>
+                        <Button>
+                            <a className='flex items-center' href={"https://github.com/" + name}>{name} <ExternalLinkIcon /></a>
+                        </Button>
+                    </div>
+                        :
+                    null
+                }
             </div>
             <section className='flex items-top pt-12 justify-center w-full h-fit pb-8 gap-4'>
-                <div className='w-[40%] h-[42rem] rounded-lg border-2 border-neutral-200 dark:border-neutral-800 relative'>
-                    <div className='w-full h-14 relative'>
-                        <svg className="size-5 absolute left-4 top-[1.1rem] text-neutral-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                <div className='w-[40%] h-[42rem] rounded-lg border-2 border-neutral-200 dark:border-neutral-800 relative text-center'>
+                    {
+                        !loading 
+                            ?  
+                        <UserGitRepos repos={repos} loading={loading} setPro={setPro} showSearchedProject={showSearchedProject}/>
+                            :
+                        <svg className="animate-spin size-6 text-black dark:text-white inline-block mt-28" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
-                        <input onChange={(e) => showSearchedProject(e)} className="w-full h-full bg-transparent border-neutral-200 py-2 text-sm
-                        dark:border-neutral-800 border-b rounded-lg pl-12 
-                        focus:shadow-xl shadow-black dark:shadow-white" type="email" placeholder="Search Repositories & projects" />
-                    </div>
-                    <div className='w-full h-[88%] overflow-y-scroll text-center relative'>
-                        {
-                            !loading
-                                ?
-                                repos.map((repo, id: number) =>
-                                    <a key={id} href={repo?.url}
-                                        className='w-full h-14 border border-neutral-200 dark:border-neutral-800 rounded-sm flex items-center
-                                px-4 gap-2 justify-between'>
-                                        <h1 className='text-base'>
-                                            <GitHubLogoIcon className='size-5 mr-2 inline-block' />
-                                            {repo?.name.slice(0, 26)} · <span className='text-[0.7rem] tracking-tight'>{monthsPassed(repo?.pushed_at)}</span>
-                                        </h1>
-                                        <Button className='h-8'>Deploy</Button>
-                                    </a>)
-                                :
-                                loading == "nothing found"
-                                    ?
-                                    <h1 className='mt-12'>No Repository found</h1>
-                                    :
-                                    loading == "error"
-                                        ?
-                                        <h1 className='mt-12'>Something went wrong try reloding the page</h1>
-                                        :
-                                        <svg className="animate-spin size-6 text-black dark:text-white inline-block mt-28" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3"></circle>
-                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                        </svg>
-                        }
-                    </div>
+                    }
                 </div>
-                <div className='w-[55%] h-[42rem] rounded-lg border-2 border-neutral-200 dark:border-neutral-800
-                p-[2%] flex flex-col gap-3'>
-                    <h1 className='text-xl text-right font-semibold m-2'>Configure Project</h1>
-                    <div className='w-full h-[1.25px] bg-neutral-200 dark:bg-neutral-800 my-1'></div>
-                    <div>
-                        <label className='text-[0.8rem] text-neutral-400'>Project name</label>
-                        <input className='pl-2 bg-transparent h-10 rounded-md mt-1 text-sm w-full border-2 border-neutral-200 dark:border-neutral-800'
-                            type='text' placeholder='my money making project' />
-                    </div>
-                    <div className='w-full'>
-                        <label className='text-[0.8rem] text-neutral-400'>Language</label>
-                        <Select>
-                            <SelectTrigger className="w-full mt-1">
-                                <SelectValue className='text-slate-400' placeholder="Programming language used in your porject" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="python">Python</SelectItem>
-                                <SelectItem value="rust">Rust</SelectItem>
-                                <SelectItem value="nodejs">Nodejs</SelectItem>
-                                <SelectItem value="cpp">C++</SelectItem>
-                                <SelectItem value="ruby">Ruby</SelectItem>
-                                <SelectItem value="go">Golang</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div className='w-full'>
-                        <label className='text-[0.8rem] text-neutral-400'>Region</label>
-                        <Select>
-                            <SelectTrigger className="w-full mt-1">
-                                <SelectValue placeholder="Where would you like to deploy your project ?" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="virginia">Virginia (us-east)</SelectItem>
-                                <SelectItem value="oregon">Oregon (use-west)</SelectItem>
-                                <SelectItem value="frankfurt">frankfurt (eu-central)</SelectItem>
-                                <SelectItem value="mumbai">Mumbai (south-asia)</SelectItem>
-                                <SelectItem value="singapore">Singapore (southeast-asia)</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div>
-                        <label className='text-[0.8rem] text-neutral-400'>Root directory - <span className='text-xs'>optional</span></label>
-                        <input className='pl-2 bg-transparent h-10 rounded-md mt-1 text-sm w-full border-2 border-neutral-200 dark:border-neutral-800'
-                            type='text' placeholder='e.g. src' />
-                    </div>
-                    <h1 className='text-xl text-right font-semibold m-2'>Commands</h1>
-                    <div className='w-full h-[1.25px] bg-neutral-200 dark:bg-neutral-800 my-1'></div>
-                    <div>
-                        <TooltipProvider>
-                            <Tooltip>
-                                <TooltipTrigger className='text-[0.8rem] text-neutral-400 flex items-center'>Build Commands&nbsp; <InfoCircledIcon/></TooltipTrigger>
-                                <TooltipContent className='mt-1'>
-                                    Will use these to build your project, seprate each command with a semi-colon
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
-                        <input className='pl-2 bg-transparent h-10 rounded-md mt-1 text-sm w-full border-2 border-neutral-200 dark:border-neutral-800'
-                            type='text' placeholder='e.g. npm install; npm run build' />
-                    </div>
-                    <div>
-                        <TooltipProvider>
-                            <Tooltip>
-                                <TooltipTrigger className='text-[0.8rem] text-neutral-400 flex items-center'>Start Command&nbsp; <InfoCircledIcon/></TooltipTrigger>
-                                <TooltipContent className='mt-1'>
-                                    Will use these to start / run your project on each deployemnt
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
-                        <input className='pl-2 bg-transparent h-10 rounded-md mt-1 text-sm w-full border-2 border-neutral-200 dark:border-neutral-800'
-                            type='text' placeholder='e.g. npm run start or cargo run' />
-                    </div>
-                </div>
+                <ProjectConfig pro={pro}/>
             </section>
-            <div className='w-[96%] rounded-lg m-auto border-2 p-8 border-neutral-200 dark:border-neutral-800'>
-                <h1 className='text-xl  font-semibold m-2'>Select compute type</h1>
-                <div className='flex items-center justify-between gap-2 h-full'>
-                    <div className='w-[25%] mx-2'>
-                        <ul>
-                           {
-                                features.map((feature, id) => <li key={id} className='flex items-center gap-2 font-medium'>
-                                    <CheckCircledIcon/> {feature}
-                                </li>)
-                           } 
-                        </ul>
-                    </div>
-                    <div className='grid grid-cols-3 w-[75%] h-full gap-2'>
-                        {
-                            plans.map((plan, id) => <div key={id} className='border-2 border-neutral-200 dark:border-neutral-800 col-span-1 rounded-lg h-24 p-4
-                            flex items-end justify-between'>
-                                <div>
-                                    <p className='font-medium text-neutral-500'>{plan.name}</p>
-                                    <h1 className='text-xl font-bold'>${plan.price}<span className='text-xs font-light'> / Month</span></h1>
-                                </div>
-                                <p className='font-bold text-sm text-neutral-500'>{plan.cpu}vCPU · {plan.ram}(RAM)</p>
-                            </div>)
-                        }
-                    </div>
-                </div>
-            </div>
+            <SelectCompute compute={compute} setCompute={setCompute}/>
             <br/>
-            <div className='w-[96%] rounded-lg m-auto border-2 p-8 border-neutral-200 dark:border-neutral-800'>
-                <h1 className='text-xl  font-semibold m-2'>Enviroment variables</h1>
-                <div className='m-2 text-neutral-500'>
-                    Your project secrets will be safe here. Copy paste your .env file here. Please add a semi-colon at end the of each value for simpler .env parsing.
-                </div>
-                <textarea className='w-full h-14 rounded-md bg-transparent pl-6 pt-4 text-sm border-2 border-neutral-200 dark:border-neutral-800' placeholder='e.g  SECRET_TOKEN=12345;'/>
-                <Button className='mt-2'>Deploy your app</Button>
-            </div>
-           
+            <EnvVariable/>
+            <br/>
+            <Button className='m-auto w-[36%] flex items-center justify-center'>Deploy your app</Button>
         </main>
     )
 }
