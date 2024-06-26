@@ -1,3 +1,4 @@
+import { UserRepo } from "@/types/types";
 import { Octokit } from "@octokit/rest";
 import { useSession } from "next-auth/react";
 import { useState, useEffect, useRef } from "react";
@@ -5,8 +6,8 @@ import { useState, useEffect, useRef } from "react";
 export default function useGitRepos() {
 
     const session = useSession()
-    const [repos, setRepos] = useState<any[]>([])
-    const [repos2, setRepos2] = useState<any[]>([])
+    const [repos, setRepos] = useState<UserRepo[]>([])
+    const [repos2, setRepos2] = useState<UserRepo[]>([])
     const [loading, setLoading] = useState<any>(true)
     const cache = useRef<any[]>([]);
 
