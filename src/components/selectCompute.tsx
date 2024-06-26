@@ -1,8 +1,12 @@
 import { features, plans } from '@/constants'
+import { ProjectConfigType } from '@/types/types'
 import { CheckCircledIcon } from '@radix-ui/react-icons'
-import { Dispatch, SetStateAction } from 'react'
+import { useState } from 'react'
 
-export default function SelectCompute({compute, setCompute}:{compute: string, setCompute: Dispatch<SetStateAction<string>>}) {
+export default function SelectCompute({projectConfig} : {projectConfig: ProjectConfigType}) {
+
+    const [instanceType, setInstanceType] = useState(projectConfig.compute.instanceType);
+
     return (
         <div className='w-[96%] rounded-lg m-auto border-2 p-8 border-neutral-200 dark:border-neutral-800'>
             <div className='flex items-center justify-between gap-2 h-full'>
@@ -27,8 +31,11 @@ export default function SelectCompute({compute, setCompute}:{compute: string, se
                     {
                         plans.map((plan, id) => <div key={id} className={`border-2 border-neutral-200 dark:border-neutral-800 
                             col-span-1 rounded-lg h-24 p-4 flex items-end justify-between 
-                            ${compute == plan.name ? "bg-neutral-200 dark:bg-neutral-800" : ""}`}
-                            onClick={() => setCompute(plan.name)}>
+                            ${instanceType == plan.name ? "bg-neutral-200 dark:bg-neutral-800" : ""}`}
+                            onClick={() => {
+                                setInstanceType(plan.name)
+                                projectConfig.compute.instanceType = plan.name
+                            }}>
                             <div>
                                 <p className='font-medium text-neutral-500'>{plan.name}</p>
                                 <h1 className='text-xl font-bold'>${plan.price}<span className='text-xs font-light'> / Month</span></h1>

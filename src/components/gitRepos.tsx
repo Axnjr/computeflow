@@ -2,22 +2,23 @@ import { monthsPassed } from '@/lib/utils'
 import { GitHubLogoIcon } from '@radix-ui/react-icons'
 import React, { Dispatch } from 'react'
 import { Button } from './ui/button'
+import { ProjectConfigType, UserRepo } from '@/types/types'
 
 export default function UserGitRepos(
     {
         loading,
         repos,
-        setPro,
+        projectConfig,
+        setProjectName,
         showSearchedProject
     }: {
         loading: string | boolean,
-        repos: any,
-        setPro: Dispatch<any>,
+        repos: UserRepo[],
+        projectConfig: ProjectConfigType | undefined,
+        setProjectName: Dispatch<string>,
         showSearchedProject(e: React.ChangeEvent<HTMLInputElement>): void
     }
 ) {
-
-    console.log("git repos component was rendered !! loading:", loading)
 
     return (
         <>
@@ -39,14 +40,22 @@ export default function UserGitRepos(
                         ?
                     <h1 className='mt-12'>Something went wrong try reloding the page</h1>
                         :
-                    repos.map((repo: any, id: number) => <div key={id}
+                    repos.map((repo, id: number) => <div key={id}
                             className='w-full h-14 border border-neutral-200 dark:border-neutral-800 rounded-sm flex items-center
                                 px-4 gap-2 justify-between'>
                             <a className='text-base hover:underline' href={repo?.url}>
                                 <GitHubLogoIcon className='size-5 mr-2 inline-block' />
-                                {repo?.name.slice(0, 26)} · <span className='text-[0.7rem] tracking-tight'>{monthsPassed(repo?.pushed_at)}</span>
+                                {repo?.name?.slice(0, 26)} · <span className='text-[0.7rem] tracking-tight'>{monthsPassed(repo?.pushed_at)}</span>
                             </a>
-                            <Button onClick={() => setPro(repo)} className='h-8'>Deploy</Button>
+                            <Button onClick={() => {
+                                setProjectName(repo.name);
+                                if(projectConfig){
+                                    projectConfig.name = repo.name;
+                                    projectConfig.lang = repo.lang;
+                                    projectConfig.url = repo.url;
+                                    projectConfig.pushed_at = repo.pushed_at;
+                                }
+                            }} className='h-8'>Deploy</Button>
                     </div>)
                 }
             </div>
