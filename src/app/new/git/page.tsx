@@ -4,17 +4,20 @@ import useGitRepos from '@/hooks/useGitRepos';
 import { ExternalLinkIcon } from '@radix-ui/react-icons';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import ProjectConfig from '@/components/projectConfig';
 import SelectCompute from '@/components/selectCompute';
 import EnvVariable from '@/components/envVariable';
+import { ProjectConfigType, dummyProjectConfig } from '@/types/types';
 
 export default function DeployViaGithub() {
 
     const { repos, repos2, loading, setRepos, setLoading } = useGitRepos()
-    const [pro, setPro] = useState<typeof repos[0] | undefined>(undefined)
-    const [compute, setCompute] = useState("")
+    const pro = useRef<ProjectConfigType>(dummyProjectConfig)
+    const [projectName, setProjectName] = useState(pro.current.name)
     const router = useRouter()
+
+    console.log("MAIN GIT PAGE !!")
 
     function showSearchedProject(e: React.ChangeEvent<HTMLInputElement>) {
         router.push(`?q=${e.currentTarget.value}`)
@@ -62,7 +65,7 @@ export default function DeployViaGithub() {
                     {
                         !loading 
                             ?  
-                        <UserGitRepos repos={repos} loading={loading} setPro={setPro} showSearchedProject={showSearchedProject}/>
+                        <UserGitRepos setProjectName={setProjectName} repos={repos} loading={loading} showSearchedProject={showSearchedProject} projectConfig={pro.current}/>
                             :
                         <svg className="animate-spin size-6 text-black dark:text-white inline-block mt-28" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3"></circle>
@@ -70,13 +73,28 @@ export default function DeployViaGithub() {
                         </svg>
                     }
                 </div>
-                <ProjectConfig pro={pro}/>
+                <ProjectConfig projectName={projectName} projectConfig={pro.current} />
             </section>
-            <SelectCompute compute={compute} setCompute={setCompute}/>
+            <SelectCompute projectConfig={pro.current} />
             <br/>
             <EnvVariable/>
             <br/>
-            <Button className='m-auto w-[36%] flex items-center justify-center'>Deploy your app</Button>
+            <Button onClick={() => {
+                // @ts-ignore
+                pro.current.name = document.getElementById("projectnameinputfeild").value
+                // @ts-ignore
+                pro.current.commands.rootDir = document.getElementById("rootdirinputfeild").value; 
+                // @ts-ignore
+                pro.current.commands.buildCommands = document.getElementById("buildcommandinputfeild").value
+                // @ts-ignore
+                pro.current.commands.startCommand = document.getElementById("startcommandinputfeild").value
+                // @ts-ignore
+                pro.current.env = document.getElementById("envvariblesinputfeild").value
+                console.log(pro.current)
+            }}
+            className='m-auto w-[36%] flex items-center justify-center'>
+                Deploy your app
+            </Button>
         </main>
     )
 }

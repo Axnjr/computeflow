@@ -12,7 +12,14 @@ export default async function Home() {
 	const session = getServerSession(authConfig);
     const auth = await session.auth();
 	const xata = new XataClient();
-	const projects = await xata.db.user_projects.filter({"user.email":auth?.user?.email}).getAll()
+	const projects = await xata.db.user_projects.select([
+		"project_name", 
+		"ip",
+		"region",
+		"status",
+		"id",
+		"user.xata.updatedAt"
+	]).filter({"user.email":auth?.user?.email}).getAll()
 
 	return (
 		<main className="h-screen w-full dark:bg-black bg-white dark:text-white text-black">
