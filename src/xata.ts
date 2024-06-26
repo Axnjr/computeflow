@@ -80,7 +80,10 @@ const tables = [
       { name: "status", type: "string" },
       { name: "region", type: "string" },
       { name: "runtime", type: "string" },
-      { name: "deployed_from", type: "string" }
+      { name: "deployed_from", type: "string" },
+      { name: "instance_metadata", type: "json" },
+      { name: "commands", type: "json" },
+      { name: "env_variables", type: "json" },
     ],
   },
 ] as const;
