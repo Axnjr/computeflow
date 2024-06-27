@@ -1,3 +1,4 @@
+import { ProjectConfigType } from "@/types/types";
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 
@@ -19,4 +20,13 @@ export function monthsPassed(dateString: string) {
 	// 	}
 	// }
 	return totalMonthsPassed == 0 ? "in this month" : `${totalMonthsPassed} month ago`;
+}
+
+export async function deployInstance(projectConfig: ProjectConfigType){
+	const res = await fetch("/api/deploy", {
+		method:"POST",
+		body: JSON.stringify(projectConfig),
+	})
+	console.log("RESPINSE: ",res)
+	return await res.json()
 }
