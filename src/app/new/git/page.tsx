@@ -9,6 +9,7 @@ import ProjectConfig from '@/components/projectConfig';
 import SelectCompute from '@/components/selectCompute';
 import EnvVariable from '@/components/envVariable';
 import { ProjectConfigType, dummyProjectConfig } from '@/types/types';
+import { deployInstance } from '@/lib/utils';
 
 export default function DeployViaGithub() {
 
@@ -16,8 +17,6 @@ export default function DeployViaGithub() {
     const pro = useRef<ProjectConfigType>(dummyProjectConfig)
     const [projectName, setProjectName] = useState(pro.current.name)
     const router = useRouter()
-
-    console.log("MAIN GIT PAGE !!")
 
     function showSearchedProject(e: React.ChangeEvent<HTMLInputElement>) {
         router.push(`?q=${e.currentTarget.value}`)
@@ -91,6 +90,8 @@ export default function DeployViaGithub() {
                 // @ts-ignore
                 pro.current.env = document.getElementById("envvariblesinputfeild").value
                 console.log(pro.current)
+                deployInstance(pro.current)
+                .then(res => alert(res?.instanceId))
             }}
             className='m-auto w-[36%] flex items-center justify-center'>
                 Deploy your app
