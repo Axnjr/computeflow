@@ -10,11 +10,16 @@ import SelectCompute from '@/components/selectCompute';
 import EnvVariable from '@/components/envVariable';
 import { ProjectConfigType, dummyProjectConfig } from '@/types/types';
 import { deployInstance } from '@/lib/utils';
+import { useSession } from 'next-auth/react';
 
 export default function DeployViaGithub() {
 
+    const session = useSession();
     const { repos, repos2, loading, setRepos, setLoading } = useGitRepos()
     const pro = useRef<ProjectConfigType>(dummyProjectConfig)
+
+    pro.current.userId = session.data?.user.id as string
+
     const [projectName, setProjectName] = useState(pro.current.name)
     const router = useRouter()
 
@@ -91,7 +96,7 @@ export default function DeployViaGithub() {
                 pro.current.env = document.getElementById("envvariblesinputfeild").value
                 console.log(pro.current)
                 deployInstance(pro.current)
-                .then(res => alert(res?.instanceId))
+                .then(res => router.push(`/${res}?create=true`))
             }}
             className='m-auto w-[36%] flex items-center justify-center'>
                 Deploy your app
