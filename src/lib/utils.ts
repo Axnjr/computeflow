@@ -23,10 +23,11 @@ export function monthsPassed(dateString: string) {
 }
 
 export async function deployInstance(projectConfig: ProjectConfigType){
-	const res = await fetch("/api/deploy", {
+	let res = await fetch("/api/deploy", {
 		method:"POST",
 		body: JSON.stringify(projectConfig),
 	})
-	console.log("RESPINSE: ",res)
-	return await res.json()
+	res = await res.json()
+	// @ts-ignore
+	return res?.instanceId
 }
