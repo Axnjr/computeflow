@@ -83,7 +83,7 @@ const tables = [
       { name: "deployed_from", type: "string" },
       { name: "instance_metadata", type: "json" },
       { name: "commands", type: "json" },
-      { name: "env_variables", type: "json" },
+      { name: "env_variables", type: "string" },
     ],
   },
 ] as const;
