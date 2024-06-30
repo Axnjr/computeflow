@@ -1,20 +1,3 @@
-/**
- * PROJECT DEPLOYMENT FLOW:
-    * Will deploy an base machine with user's runtime & git installed
-    * Will return the instanceId back to the client / user device
-    * Client will fetch instance details using the instanceId
-    * Client will get the public ip address of the machine
-    * So client would
-/*/
-
-
-
-
-
-
-
-
-
 import { NextRequest, NextResponse } from "next/server";
 import { EC2Client, RunInstancesCommand, DescribeInstancesCommand } from "@aws-sdk/client-ec2";
 import { ProjectConfigType } from "@/types/types";
@@ -33,19 +16,6 @@ export async function POST(req: NextRequest){
     const projectConfig: ProjectConfigType = await req.json()
     console.log(projectConfig)
 
-const userDataScript = 
-`
-
-`;
-
-// sudo yum install git -y
-// git —version
-
-// git clone ${projectConfig.url} /home/ec2-user/${projectConfig.name}
-// cd /home/ec2-user/${projectConfig.name}//${projectConfig.commands.rootDir}
-// ${projectConfig.commands.buildCommands}
-// ${projectConfig.commands.startCommand}
-
     const command = new RunInstancesCommand({
         ImageId:"ami-0e1d06225679bc1c5",//"ami-06041499d7ab7c387", 
         InstanceType:"t2.micro",
@@ -57,7 +27,7 @@ const userDataScript =
         Monitoring:{
             Enabled:true,
         },
-        UserData:Buffer.from(userDataScript).toString('base64'),
+        // UserData:Buffer.from(userDataScript).toString('base64'),
         // IamInstanceProfile:{
         //     Name:"CloudWatchAgentServerRole"
         // }
@@ -67,10 +37,7 @@ const userDataScript =
         const data = await ec2.send(command);
         // console.log(data)
         if(data.Instances) {
-            return new NextResponse(JSON.stringify({
-                instanceId: data?.Instances[0].InstanceId,
-                instanceMetadata: data.Instances[0]
-            }))
+            return NextResponse.json({ instanceId: data?.Instances[0].InstanceId }, {status: 200})
         }
     }
     catch(err) {
@@ -137,3 +104,19 @@ sudo docker run -p 80:80 yeasy/simple-web:latest
     }
     
 }
+
+/**
+ * PROJECT DEPLOYMENT FLOW:
+    * Will deploy an base machine with user's runtime & git installed
+    * Will return the instanceId back to the client / user device
+    * Client will fetch instance details using the instanceId
+    * Client will get the public ip address of the machine
+    * So client would
+/*/
+// sudo yum install git -y
+// git —version
+
+// git clone ${projectConfig.url} /home/ec2-user/${projectConfig.name}
+// cd /home/ec2-user/${projectConfig.name}//${projectConfig.commands.rootDir}
+// ${projectConfig.commands.buildCommands}
+// ${projectConfig.commands.startCommand}
