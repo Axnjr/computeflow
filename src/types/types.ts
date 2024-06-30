@@ -17,6 +17,7 @@ type xata = {
 
 export type UserRepo = {
     name: string,
+    userId: string,
     url: string,
     pushed_at:string,
     lang: string,
@@ -42,6 +43,7 @@ type Compute = {
 
 export const dummyProjectConfig: ProjectConfigType = {
     name: '',
+    userId: '',
     url: '',
     pushed_at: '',
     lang: '',
