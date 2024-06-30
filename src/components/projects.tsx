@@ -33,7 +33,7 @@ export default function Projects({ userProjects }: { userProjects: string }) {
                 <Button className="h-10" variant="outline" type="submit">Sort by</Button>
                 <NewProjectDrawer/>
             </div>
-            <div className="w-[98%] m-auto mt-4 h-[50vh] rounded-lg border border-neutral-200 
+            <div className="w-[98%] m-auto mt-4 h-fit rounded-lg border border-neutral-200 
             dark:border-neutral-800 px-6 py-8 grid grid-cols-3 gap-4">
                 {
                     pros.length > 0
