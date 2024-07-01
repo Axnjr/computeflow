@@ -27,7 +27,26 @@ export async function deployInstance(projectConfig: ProjectConfigType){
 		method:"POST",
 		body: JSON.stringify(projectConfig),
 	})
+	if (!res.ok) {
+		console.log("Error occured in deploying project: ",await res.json())
+		return `Unexpected error occured !`
+	}
 	res = await res.json()
 	// @ts-ignore
 	return res?.instanceId
 }
+
+export async function addProjectConfigToDatabase(projectConfig: ProjectConfigType){
+	let res = await fetch("/api/createUserProject", {
+		method:"POST",
+		body: JSON.stringify(projectConfig),
+	})
+	if (!res.ok) {
+		console.log("Error occured in creating user project: ", await res.json())
+		return `Unexpected error occured !`
+	}
+	res = await res.json() // endpoint send an object with projectID
+	// @ts-ignore
+	return res?.projectId
+}
+
