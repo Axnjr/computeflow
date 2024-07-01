@@ -6,7 +6,8 @@ export type Project = {
     region: string,
     runtime: string,
     deployed_from: string,
-    xata: xata
+    xata: xata,
+    instance_metadata: Compute
 }
 
 type xata = {
