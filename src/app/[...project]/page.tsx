@@ -4,6 +4,7 @@ import { XataClient } from "@/xata";
 import { redirect } from 'next/navigation'
 import { GitHubLogoIcon, ExternalLinkIcon } from "@radix-ui/react-icons";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { getIpAddress } from "@/lib/aws";
 
 
 export default async function ProjectPage({ params, searchParams }: { params: { project: string }, searchParams: { [key: string]: string | string[] | undefined } }) {
@@ -15,7 +16,7 @@ export default async function ProjectPage({ params, searchParams }: { params: { 
         console.log("Project data with name: ", res)
     }
     else {
-        res = await xata.db.user_projects.filter({ project_name: params.project }).getFirst()
+        res = await xata.db.user_projects.filter({ id: params.project }).getFirst()
     }
 
     // @ts-ignore
@@ -24,11 +25,18 @@ export default async function ProjectPage({ params, searchParams }: { params: { 
     } // @ts-ignore
     const project: Project = res;
 
+    let ip;
+    if(project.ip == null || project.ip == undefined){
+        ip = await getIpAddress(project.instance_metadata.instanceId)
+        await xata.db.user_projects.update(project.id, { "ip": ip })
+    }
+    ip = project.ip;
+
     return (
         <main className="h-screen w-full dark:bg-black bg-white dark:text-white text-black">
             <div className="w-full border-b p-8 border-neutral-200 dark:border-neutral-800 bg-neutral-50 
             dark:bg-neutral-950 flex items-center justify-between">
-                <a href={"https://" + project?.project_name + ".cheapcloud.dev"} className="text-4xl tracking-tighter capitalize hover:underline group inline-block">
+                <a href={ip} className="text-4xl tracking-tighter capitalize hover:underline group inline-block">
                     {project?.project_name}
                     <ExternalLinkIcon className="hidden group-hover:inline-block size-7" />
                 </a>
