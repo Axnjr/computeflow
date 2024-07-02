@@ -27,7 +27,6 @@ export default async function Home() {
 				<h1 className="text-4xl">Overview</h1>
 			</div>
 			<Projects userProjects={JSON.stringify(projects)}/>
-			
 		</main>
 	);
 }
