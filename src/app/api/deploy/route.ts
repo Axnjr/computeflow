@@ -1,11 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { EC2Client, RunInstancesCommand, DescribeInstancesCommand } from "@aws-sdk/client-ec2";
+import { EC2Client, RunInstancesCommand, DescribeInstancesCommand, CreateSecurityGroupCommand, AuthorizeSecurityGroupIngressCommand } from "@aws-sdk/client-ec2";
 import { ProjectConfigType } from "@/types/types";
-
-const credentials = {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID as string,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY as string,
-};
+import { credentials } from "@/lib/server-utils";
 
 const ec2 = new EC2Client({
     region: "ap-south-1",
@@ -14,7 +10,37 @@ const ec2 = new EC2Client({
 
 export async function POST(req: NextRequest){
     const projectConfig: ProjectConfigType = await req.json()
-    console.log(projectConfig)
+    // const userDataScript = getUserDataScript(projectConfig.url, projectConfig.name, "sudo yum install -y nodejs npm")
+    // console.log(userDataScript)
+
+    const userDataScript = 
+`Content-Type: multipart/mixed; boundary="//"
+MIME-Version: 1.0
+
+--//
+Content-Type: text/cloud-config; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment; filename="cloud-config.txt"
+
+#cloud-config
+cloud_final_modules:
+- [scripts-user, always]
+
+--//
+Content-Type: text/x-shellscript; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment; filename="userdata.txt"
+
+#!/bin/bash
+sudo yum update -y
+sudo yum install git -y
+sudo yum install -y nodejs npm
+sudo mkdir radhakrishn
+echo "RADHA RADHA KRISHN KRISHN"
+--//--
+`;
 
     const command = new RunInstancesCommand({
         ImageId:"ami-0e1d06225679bc1c5",//"ami-06041499d7ab7c387", 
@@ -27,10 +53,10 @@ export async function POST(req: NextRequest){
         Monitoring:{
             Enabled:true,
         },
-        // UserData:Buffer.from(userDataScript).toString('base64'),
-        // IamInstanceProfile:{
-        //     Name:"CloudWatchAgentServerRole"
-        // }
+        UserData:Buffer.from(userDataScript).toString('base64'),
+        IamInstanceProfile:{
+            Name:"RoleToExecuteCommandsOnEC2"
+        }
     });
 
     try {
