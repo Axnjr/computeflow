@@ -9,7 +9,7 @@ import ProjectConfig from '@/components/projectConfig';
 import SelectCompute from '@/components/selectCompute';
 import EnvVariable from '@/components/envVariable';
 import { ProjectConfigType, dummyProjectConfig } from '@/types/types';
-import { addProjectConfigToDatabase, deployInstance } from '@/lib/utils';
+import { addProjectConfigToDatabase, deployInstance, getCommandStatus, runCommandOnInstance, sleep } from '@/lib/utils';
 import { useSession } from 'next-auth/react';
 
 export default function DeployViaGithub() {
@@ -22,6 +22,7 @@ export default function DeployViaGithub() {
 
     const [projectName, setProjectName] = useState(pro.current.name)
     const [deploymentStatus, setDeploymentStatus] = useState(false)
+    const [deployemntLog, setDeploymentLog] = useState("")
     const router = useRouter()
 
     function showSearchedProject(e: React.ChangeEvent<HTMLInputElement>) {
@@ -36,6 +37,23 @@ export default function DeployViaGithub() {
             setRepos([...temp])
             setLoading(false)
         }
+    }
+
+    function handleDeployment() {
+        // const deploymentLog1 = new Date().toUTCString() + ":" + "Deployment Intiated"
+        setDeploymentLog("Deployment Initiated")
+        // @ts-ignore
+        pro.current.name = document.getElementById("projectnameinputfeild").value
+        // @ts-ignore
+        pro.current.commands.rootDir = document.getElementById("rootdirinputfeild").value;
+        // @ts-ignore
+        pro.current.commands.buildCommands = document.getElementById("buildcommandinputfeild").value.split(",")
+        // @ts-ignore
+        pro.current.commands.startCommand = document.getElementById("startcommandinputfeild").value
+        // @ts-ignore
+        pro.current.env = document.getElementById("envvariblesinputfeild").value
+        setDeploymentStatus(true)
+        
     }
 
     let name = repos[0]?.url?.replace("https://github.com/", "").split("/")[0];
@@ -53,24 +71,24 @@ export default function DeployViaGithub() {
                     </div>
                 </h1>
                 {
-                    !loading 
-                        ? 
-                    <div className='flex items-center gap-2'>
-                        <Button variant="ghost">{repos.length} Repositories</Button>
-                        <Button>
-                            <a className='flex items-center' href={"https://github.com/" + name}>{name} <ExternalLinkIcon /></a>
-                        </Button>
-                    </div>
+                    !loading
+                        ?
+                        <div className='flex items-center gap-2'>
+                            <Button variant="ghost">{repos.length} Repositories</Button>
+                            <Button>
+                                <a className='flex items-center' href={"https://github.com/" + name}>{name} <ExternalLinkIcon /></a>
+                            </Button>
+                        </div>
                         :
-                    null
+                        null
                 }
             </div>
             <section className='flex items-top pt-12 justify-center w-full h-fit pb-8 gap-4'>
                 <div className='w-[40%] h-[42rem] rounded-lg border-2 border-neutral-200 dark:border-neutral-800 relative text-center'>
                     {
-                        !loading 
-                            ?  
-                        <UserGitRepos setProjectName={setProjectName} repos={repos} loading={loading} showSearchedProject={showSearchedProject} projectConfig={pro.current}/>
+                        !loading
+                            ?
+                        <UserGitRepos setProjectName={setProjectName} repos={repos} loading={loading} showSearchedProject={showSearchedProject} projectConfig={pro.current} />
                             :
                         <svg className="animate-spin size-6 text-black dark:text-white inline-block mt-28" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3"></circle>
@@ -81,55 +99,31 @@ export default function DeployViaGithub() {
                 <ProjectConfig projectName={projectName} projectConfig={pro.current} />
             </section>
             <SelectCompute projectConfig={pro.current} />
-            <br/>
-            <EnvVariable/>
-            <br/>
-            <Button onClick={() => {
-                // @ts-ignore
-                pro.current.name = document.getElementById("projectnameinputfeild").value
-                // @ts-ignore
-                pro.current.commands.rootDir = document.getElementById("rootdirinputfeild").value; 
-                // @ts-ignore
-                pro.current.commands.buildCommands = document.getElementById("buildcommandinputfeild").value
-                // @ts-ignore
-                pro.current.commands.startCommand = document.getElementById("startcommandinputfeild").value
-                // @ts-ignore
-                pro.current.env = document.getElementById("envvariblesinputfeild").value
-                setDeploymentStatus(true)
-                deployInstance(pro.current)
-                .then(res => {
-                    if(res != "Unexpected error occured !"){
-                        pro.current.compute.instanceId = res
-                        addProjectConfigToDatabase(pro.current)
-                        .then(project => {
-                            if(project != "Unexpected error occured !"){
-                                router.push(`/${project}`)
-                            }
-                            else{
-                                alert(project)
-                            }
-                        })
-                    }
-                    else {
-                        alert(res)
-                    }
-                })
-            }}
-            className='m-auto w-[36%] flex items-center justify-center'>
+            <br />
+            <EnvVariable />
+            <br />
+            <Button onClick={handleDeployment} className='m-auto w-1/2 flex items-center justify-center'>
                 {
-                    deploymentStatus 
+                    deploymentStatus
                         ?
                     <>
                         <svg className="animate-spin size-[0.9rem] mx-2 text-white dark:text-black inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3"></circle>
                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
-                        <span className='text-neutral-500 font-semibold'>Deploying</span>
+                        <span className='text-neutral-500 font-semibold'>{deployemntLog}</span>
                     </>
                         :
                     <span className='font-semibold'>Deploy Project</span>
                 }
             </Button>
+            <br/>
+            <div className='w-[96%] rounded-lg m-auto border-2 p-8 border-neutral-200 dark:border-neutral-800'>
+                <h1 className='text-xl  font-semibold mx-2 mt-2 mb-4'>Deployment logs</h1>
+                <div className='w-full h-32 p-4 border rounded-lg border-neutral-200 dark:border-neutral-800'>
+
+                </div>
+            </div>
         </main>
     )
 }
@@ -147,4 +141,51 @@ export default function DeployViaGithub() {
     * env_vars
     * instance_type
     * instance_id
+ */
+
+/**
+ *         deployInstance(pro.current)
+            .then(instanceId => {
+                setDeploymentLog(`Compute machine located in region: ${pro.current.region}`)
+                addProjectConfigToDatabase(pro.current)
+                    .then(() => { // ! 1
+                        setDeploymentLog("Waiting for instance to become live !")
+                        sleep(15000) // wait for 15s
+                            .then(() => { // ! 2
+                                setDeploymentLog("Connecting with Instance !")
+                                runCommandOnInstance(instanceId, [
+                                    "sudo su", 
+                                    `git clone ${pro.current.url} /RADHA-RADHA/ec2-user`, 
+                                    `cd /RADHA-RADHA/ec2-user` , 
+                                    "npm install",
+                                    "node index.js"
+                                    // ...pro.current.commands.buildCommands,
+                                    // pro.current.commands.startCommand
+                                ])
+                                    .then(commandId => { // ! 3
+                                        setDeploymentLog("Building your project")
+                                        sleep(10000)
+                                            .then(() => {
+                                                setDeploymentLog("Setting up your instance")
+                                                getCommandStatus(commandId, instanceId)
+                                                    .then(status => {
+                                                        // @ts-ignore
+                                                        if (['Success', 'Failed', 'Cancelled'].includes(status)){
+                                                            setDeploymentStatus(false)
+                                                        }
+                                                        alert(status)
+                                                        setDeploymentLog("Deployment complete")
+                                                    })
+                                            })
+                                    })
+                                }
+                            )
+                    })
+                }
+            )
+
+        // console.log("Waiting for instance to become live !")    
+        // sleep(10000)
+        // .then(() => console.log("10 sec ho gye"))
+        // runCommandOnInstance("i-0304e92cddcd43cb9", ["sudo yum install git -y", "sudo yum install -y nodejs npm"])
  */
