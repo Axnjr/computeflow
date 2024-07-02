@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import { Button } from './ui/button'
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { Project } from '@/types/types';
+import { ProjectSpecificDataType } from '@/types/types';
 import NewProjectDrawer from './newProjectDrawer';
 import { monthsPassed } from '@/lib/utils';
 
@@ -11,11 +11,11 @@ export default function Projects({ userProjects }: { userProjects: string }) {
 
     const router = useRouter()
     const sp = useSearchParams()
-    const [pros, setPros] = useState<Project[]>(JSON.parse(userProjects));
+    const [pros, setPros] = useState<ProjectSpecificDataType[]>(JSON.parse(userProjects));
 
     function showSearchedProject(e: React.ChangeEvent<HTMLInputElement>) {
         router.push(`?q=${e.currentTarget.value}`)
-        let temp = JSON.parse(userProjects).filter((pro: Project) => {
+        let temp = JSON.parse(userProjects).filter((pro: ProjectSpecificDataType) => {
             return pro.project_name.includes(e.currentTarget.value)
         })
         setPros([...temp])
@@ -38,7 +38,7 @@ export default function Projects({ userProjects }: { userProjects: string }) {
                 {
                     pros.length > 0
                         ?
-                        pros.map((project: Project, id: number) => <Link href={`/${project.id}`} className='h-36 border rounded-xl 
+                        pros.map((project: ProjectSpecificDataType, id: number) => <Link href={`/${project.id}`} className='h-36 border rounded-xl 
                         border-neutral-200 dark:border-neutral-800 p-5' key={id}>
                             <div className='flex items-top justify-between'>
                                 <h1 className='text-xl font-medium tracking-tighter capitalize block leading-0'>

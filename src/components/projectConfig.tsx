@@ -1,8 +1,7 @@
 import { InfoCircledIcon } from '@radix-ui/react-icons'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from './ui/tooltip'
-import { useState } from 'react'
-import { ProjectConfigType, UserRepo } from '@/types/types'
+import { ProjectConfigType } from '@/types/types'
 
 export default function ProjectConfig({projectConfig, projectName}:{projectConfig: ProjectConfigType, projectName: string}) {
     return (
