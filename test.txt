@@ -131,3 +131,30 @@ sudo cloud-init modules -m final
     }
 
  */
+
+
+const createGroupCommand = new CreateSecurityGroupCommand({
+    GroupName:"computeflow_security_group",
+    Description:"Security group to allow all traffic to all ports"
+});
+const createGroupResponse = await ec2.send(createGroupCommand);
+const securityGroupId = createGroupResponse.GroupId;
+console.log(`Security Group Created: ${securityGroupId}`);
+
+// Authorize inbound traffic
+const ingressParams = {
+GroupId: securityGroupId,
+IpPermissions: [
+  {
+    IpProtocol: '-1', // -1 means all protocols
+    IpRanges: [
+      {
+        CidrIp: '0.0.0.0/0', // Allow all IP addresses
+      },
+    ],
+  },
+],
+};
+const ingressCommand = new AuthorizeSecurityGroupIngressCommand(ingressParams);
+await ec2.send(ingressCommand);
+console.log(`Inbound traffic allowed for Security Group: ${securityGroupId}`);

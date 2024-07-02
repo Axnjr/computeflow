@@ -12,6 +12,7 @@
   "dependencies": {
     "@auth/xata-adapter": "^1.2.0",
     "@aws-sdk/client-ec2": "^3.596.0",
+    "@aws-sdk/client-ssm": "^3.606.0",
     "@octokit/rest": "^21.0.0",
     "@prisma/client": "^5.15.1",
     "@radix-ui/react-avatar": "^1.1.0",
