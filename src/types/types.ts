@@ -1,4 +1,4 @@
-export type Project = {
+export interface ProjectSpecificDataType {
     id: string,
     project_name: string,
     ip: string,
@@ -6,8 +6,9 @@ export type Project = {
     region: string,
     runtime: string,
     deployed_from: string,
-    xata: xata,
-    instance_metadata: Compute
+    xata?: xata,
+    instance_metadata?: Compute,
+    commands?: Commands
 }
 
 type xata = {
@@ -40,6 +41,11 @@ type Commands = {
 type Compute = {
     instanceType: string,
     instanceId?: string
+}
+
+export interface SSMCommandConfig {
+    instanceId: string,
+    commands: string[]
 }
 
 export const dummyProjectConfig: ProjectConfigType = {
