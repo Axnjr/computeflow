@@ -43,8 +43,8 @@ type Compute = {
     instanceId?: string
 }
 
-export interface SSMCommandConfig {
-    instanceId: string,
+export interface SSHCommandConfig {
+    instanceIp: string,
     commands: string[]
 }
 
