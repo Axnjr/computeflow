@@ -1,11 +1,11 @@
+// VERSION: 17
 import { Client } from 'ssh2';
 
 export async function handler(event) {
     const body = JSON.parse(event.body)
     const host = body.instanceIp;
     const username = 'ec2-user';
-    const privateKey = process.env.PRIVATE_KEY; 
-    console.log(privateKey)
+    const privateKey = process.env.PRIVATE_KEY; // NOT WORKING PASSED THE REAL KEY AS IT IS IN LAMBDA
     const commands = body.commands;
     try {
         const output = await runSSHCommand(host, username, privateKey, commands);
