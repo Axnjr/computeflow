@@ -39,8 +39,9 @@ export default function DeployViaGithub() {
         }
     }
 
-    function handleDeployment() {
+    async function handleDeployment() {
         // const deploymentLog1 = new Date().toUTCString() + ":" + "Deployment Intiated"
+        setDeploymentStatus(true)
         setDeploymentLog("Deployment Initiated")
         // @ts-ignore
         pro.current.name = document.getElementById("projectnameinputfeild").value
@@ -52,8 +53,9 @@ export default function DeployViaGithub() {
         pro.current.commands.startCommand = document.getElementById("startcommandinputfeild").value
         // @ts-ignore
         pro.current.env = document.getElementById("envvariblesinputfeild").value
-        setDeploymentStatus(true)
-        
+        pro.current.compute.instanceId = await deployInstance(pro.current)
+        let pid = await addProjectConfigToDatabase(pro.current);
+        router.push(`/${pid}`)
     }
 
     let name = repos[0]?.url?.replace("https://github.com/", "").split("/")[0];
