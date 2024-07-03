@@ -52,11 +52,16 @@ export async function addProjectConfigToDatabase(projectConfig: ProjectConfigTyp
 	return res?.projectId
 }
 
-export async function runCommandOnInstance(instanceId: string, commands: string[]) {
+export async function runCommandOnInstance(instanceIp: string | undefined, commands: string[]) {
+	// if(!instanceIp) {
+	// 	// alert("INSTANCE-ID NOT FOUND !")
+	// 	return "error"
+	// }
+	console.log("Currenly in utils")
 	let res = await fetch("/api/commands", {
 		method: "POST",
 		body: JSON.stringify({
-			instanceId: instanceId,
+			instanceIp: instanceIp,
 			commands: commands
 		}),
 	})
@@ -66,7 +71,7 @@ export async function runCommandOnInstance(instanceId: string, commands: string[
 	}
 	res = await res.json()
 	// @ts-ignore
-	return res?.commandId
+	return res
 }
 
 export async function getCommandStatus(commandId: string, instanceId: string) {
