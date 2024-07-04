@@ -34,7 +34,7 @@ export interface ProjectConfigType extends UserRepo {
 
 type Commands = {
     rootDir: string,
-    buildCommands: string[],
+    buildCommands: string,
     startCommand: string
 }
 
@@ -43,8 +43,8 @@ type Compute = {
     instanceId?: string
 }
 
-export interface SSHCommandConfig {
-    instanceIp: string,
+export interface SSMCommandConfig {
+    instanceId: string,
     commands: string[]
 }
 
@@ -57,7 +57,7 @@ export const dummyProjectConfig: ProjectConfigType = {
     region: '',
     commands: {
         rootDir: '',
-        buildCommands: [],
+        buildCommands: '',
         startCommand: ''
     },
     compute:{
