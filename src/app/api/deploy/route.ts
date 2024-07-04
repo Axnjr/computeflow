@@ -47,8 +47,8 @@ echo "RADHA RADHA KRISHN KRISHN"
         InstanceType:"t2.micro",
         MinCount:1,
         MaxCount:1,
-        KeyName:"WSSSharedClusterECS",
-        SecurityGroupIds:["sg-057a4f9af73086457"],
+        KeyName:"computeflowSSH",
+        SecurityGroupIds:["sg-0344c5dc050696095"],
         SubnetId:"subnet-0717a6882188d6909",
         Monitoring:{
             Enabled:true,
