@@ -1,4 +1,7 @@
+// import { XataClient } from "@/xata";
 import { EC2Client, DescribeInstancesCommand } from "@aws-sdk/client-ec2";
+import { redirect } from "next/navigation";
+import { cache } from "react";
 
 export const credentials = {
     accessKeyId: process.env.AWS_ACCESS_KEY_ID as string,
@@ -29,41 +32,22 @@ export async function getIpAddress(instanceId: string | undefined){
     return "456g7h8jk9l"
 }
 
-export function getUserDataScript(url: string, name: string, languageInstallationCommand: string){
-    const projectType = url.includes("github") ? "git" : "docker"
-    const runtimeComm = 
-        projectType
-            ? 
-        `sudo yum install git -y` 
-            : 
-        `sudo yum install docker -y
-        sudo systemctl start docker`
-    ;
+// export const initDash = cache(async (params: { project: string }) => {
+//     const xata = new XataClient();
+//     let res: unknown = await xata.db.user_projects.filter({ id: params.project }).getFirst()
 
-    return `
-Content-Type: multipart/mixed; boundary="//"
-MIME-Version: 1.0
+//     if (res == null) { redirect("/overview") } // @ts-ignore
+//     let project: ProjectSpecificDataType = {...res};
 
---//
-Content-Type: text/cloud-config; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment; filename="cloud-config.txt"
-
-#cloud-config
-cloud_final_modules:
-- [scripts-user, always]
-
---//
-Content-Type: text/x-shellscript; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment; filename="userdata.txt"
-
-#!/bin/bash
-sudo yum update -y
-${runtimeComm}
-${languageInstallationCommand}
-sudo mkdir radhakrishn
---//--`;
-}
+//     if (project.ip == null || project.ip == undefined) {
+//         console.log("Project under deployemnt ! fetching IpAddress | Connecting to remote compute")
+//         let ip = await getIpAddress(project.instance_metadata?.instanceId)
+//         console.log(ip)
+//         if (ip != "error") {
+//             await xata.db.user_projects.update(project.id, { "ip": ip })
+//             project.ip = ip as string;
+//         }
+//     }
+//     // console.log("DB FETCHED !")
+//     return project
+// })
