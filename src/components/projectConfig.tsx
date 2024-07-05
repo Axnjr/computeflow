@@ -75,7 +75,7 @@ export default function ProjectConfig({projectConfig, projectName}:{projectConfi
                 <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger className='text-[0.8rem] text-neutral-400 flex items-center'>
-                            Build Commands -&nbsp;<span className='text-xs'> seprate each command with a semi-colon if more than 1</span>&nbsp; <InfoCircledIcon />
+                            Build Commands -&nbsp;<span className='text-xs'> seprate each command with a "&&" if more than 1</span>&nbsp; <InfoCircledIcon />
                         </TooltipTrigger>
                         <TooltipContent className='mt-1'>
                             Will use these to build your project, seprate each command with a semi-colon
@@ -88,14 +88,14 @@ export default function ProjectConfig({projectConfig, projectName}:{projectConfi
             <div>
                 <TooltipProvider>
                     <Tooltip>
-                        <TooltipTrigger className='text-[0.8rem] text-neutral-400 flex items-center'>Start Command&nbsp; <InfoCircledIcon /></TooltipTrigger>
+                        <TooltipTrigger className='text-[0.8rem] text-neutral-400 flex items-center'>Start Command / file name&nbsp; <InfoCircledIcon /></TooltipTrigger>
                         <TooltipContent className='mt-1'>
-                            Will use these to start / run your project on each deployemnt
+                            Will use these to start / run your project on each deployemnt, either the command or the entrypoint file name.
                         </TooltipContent>
                     </Tooltip>
                 </TooltipProvider>
                 <input id='startcommandinputfeild' className='pl-2 bg-transparent h-10 rounded-md mt-1 text-sm w-full border-2 border-neutral-200 dark:border-neutral-800'
-                    type='text' placeholder='e.g. npm run start or cargo run' />
+                    type='text' placeholder='e.g. npm run start or main.js' />
             </div>
         </div>
     )
