@@ -9,7 +9,7 @@ import ProjectConfig from '@/components/projectConfig';
 import SelectCompute from '@/components/selectCompute';
 import EnvVariable from '@/components/envVariable';
 import { ProjectConfigType, dummyProjectConfig } from '@/types/types';
-import { addProjectConfigToDatabase, deployInstance, getCommandStatus, runCommandOnInstance, sleep } from '@/lib/utils';
+import { addProjectConfigToDatabase, deployInstance, timeStamp, runCommandOnInstance, sleep } from '@/lib/utils';
 import { useSession } from 'next-auth/react';
 
 export default function DeployViaGithub() {
@@ -40,22 +40,26 @@ export default function DeployViaGithub() {
     }
 
     async function handleDeployment() {
-        // const deploymentLog1 = new Date().toUTCString() + ":" + "Deployment Intiated"
         setDeploymentStatus(true)
-        setDeploymentLog("Deployment Initiated")
+        let timeStampLogs = [`,${timeStamp()} ◆ Deployment Initiated !`]
+        // setDeploymentLog("Deployment Initiated")
         // @ts-ignore
         pro.current.name = document.getElementById("projectnameinputfeild").value
         // @ts-ignore
         pro.current.commands.rootDir = document.getElementById("rootdirinputfeild").value;
         // @ts-ignore
-        pro.current.commands.buildCommands = document.getElementById("buildcommandinputfeild").value.split(",")
+        pro.current.commands.buildCommands = document.getElementById("buildcommandinputfeild").value
         // @ts-ignore
-        pro.current.commands.startCommand = document.getElementById("startcommandinputfeild").value
+        pro.current.commands.startCommand = document.getElementById("startcommandinputfeild").value.replace("node", "start")
         // @ts-ignore
         pro.current.env = document.getElementById("envvariblesinputfeild").value
         pro.current.compute.instanceId = await deployInstance(pro.current)
+        // await sleep(500)
+        timeStampLogs.push(`${timeStamp()} ◆ Compute VM located in region - ${pro.current.region} !`)
         let pid = await addProjectConfigToDatabase(pro.current);
-        router.push(`/${pid}`)
+        // await sleep(1000)
+        timeStampLogs.push(`${timeStamp()} ◆ Storing project config`)
+        router.push(`/${pid}?ts=${timeStampLogs.join()}`)
     }
 
     let name = repos[0]?.url?.replace("https://github.com/", "").split("/")[0];
