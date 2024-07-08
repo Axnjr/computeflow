@@ -2,6 +2,17 @@ import { ProjectConfigType } from "@/types/types";
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 
+export const timeStamp = () => {
+	return new Date().toLocaleString('en-US', {
+		month: 'long',
+		day: 'numeric',
+		hour: 'numeric',
+		minute: 'numeric',
+		second: 'numeric',
+		hour12: true
+	});
+};
+
 export const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export function cn(...inputs: ClassValue[]) {
@@ -52,50 +63,45 @@ export async function addProjectConfigToDatabase(projectConfig: ProjectConfigTyp
 	return res?.projectId
 }
 
-export async function runCommandOnInstance(instanceIp: string | undefined, commands: string[]) {
-	// if(!instanceIp) {
-	// 	// alert("INSTANCE-ID NOT FOUND !")
-	// 	return "error"
-	// }
-	console.log("Currenly in utils")
-	let res = await fetch("/api/commands", {
+export async function runCommandOnInstance(instanceIp: string | undefined, scripts: string[]) {
+	if (!instanceIp) {
+		alert("INSTANCE-ID NOT FOUND !")
+		return "error"
+	}
+	// console.log("Currenly in utils", instanceIp, script)
+	const myHeaders = new Headers();
+	myHeaders.append("Content-Type", "application/json");
+
+	const requestOptions: RequestInit = {
 		method: "POST",
+		headers: myHeaders,
 		body: JSON.stringify({
-			instanceIp: instanceIp,
-			commands: commands
+			"instanceIp": instanceIp,
+			"scripts": scripts
 		}),
-	})
-	if (!res.ok) {
-		console.log("Error occured in creating user project: ", await res.json())
-		return `Unexpected error occured !`
-	}
-	res = await res.json()
-	// @ts-ignore
-	return res
-}
+		redirect: "follow"
+	};
 
-export async function getCommandStatus(commandId: string, instanceId: string) {
-	// @ts-ignor
-	// return res?.commandStatus
-	let s;
-	while (true) {
-		let res = await fetch(`/api/commands?commandId=${commandId}&instanceId=${instanceId}`, {cache:"no-cache"})
+	try {
+		let res = await fetch("/api/execute", requestOptions)
 		if (!res.ok) {
-			console.log("Error occured in creating user project: ", await res.json())
-			return `Unexpected error occured !`
+			console.log("Error occurred executing commands: ", await res.json());
+			return `Unexpected error occurred!`;
 		}
-		res = await res.json()
-		// @ts-ignore
-		if (['Success', 'Failed', 'Cancelled'].includes(res?.status)) {
-			// console.log(res?.status)
-			s = res.status;
-			break;
-		}
-
-		console.log(`Command status: ${res?.status}. Waiting for completion...`);
-		await sleep(15000); // Wait for 5 seconds before checking again
+		return "Script excuted successfully check console for logs !"
+	} 
+	catch (error) {
+		console.log("Fetch error: ", error);
+		return `Failed to fetch`;
 	}
-	return s;
 }
 
-
+export async function getVMStatus(instanceId: string) {
+	const res = await fetch(`/api/vm?id=${instanceId}`)
+	if(!res.ok){
+		console.log("Error occured in getting VM status:", await res.json())
+		return "error"
+	}
+	let r = await res.json()
+	return r?.Name
+}

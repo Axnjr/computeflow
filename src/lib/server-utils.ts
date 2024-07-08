@@ -1,4 +1,4 @@
-// import { XataClient } from "@/xata";
+import { XataClient } from "@/xata";
 import { EC2Client, DescribeInstancesCommand } from "@aws-sdk/client-ec2";
 import { redirect } from "next/navigation";
 import { cache } from "react";
@@ -32,22 +32,23 @@ export async function getIpAddress(instanceId: string | undefined){
     return "456g7h8jk9l"
 }
 
-// export const initDash = cache(async (params: { project: string }) => {
-//     const xata = new XataClient();
-//     let res: unknown = await xata.db.user_projects.filter({ id: params.project }).getFirst()
+export const initDash = cache(async (params: { project: string }) => {
+    // console.log("PARAMS:   ====> ",params)
+    const xata = new XataClient();
+    let res: unknown = await xata.db.user_projects.filter({ id: params.project }).getFirst()
 
-//     if (res == null) { redirect("/overview") } // @ts-ignore
-//     let project: ProjectSpecificDataType = {...res};
+    if (res == null) { redirect("/overview") } // @ts-ignore
+    let project: ProjectSpecificDataType = {...res};
 
-//     if (project.ip == null || project.ip == undefined) {
-//         console.log("Project under deployemnt ! fetching IpAddress | Connecting to remote compute")
-//         let ip = await getIpAddress(project.instance_metadata?.instanceId)
-//         console.log(ip)
-//         if (ip != "error") {
-//             await xata.db.user_projects.update(project.id, { "ip": ip })
-//             project.ip = ip as string;
-//         }
-//     }
-//     // console.log("DB FETCHED !")
-//     return project
-// })
+    if (project.ip == null || project.ip == undefined) {
+        console.log("Project under deployemnt ! fetching IpAddress | Connecting to remote compute")
+        let ip = await getIpAddress(project.instance_metadata?.instanceId)
+        console.log(ip)
+        if (ip != "error") {
+            await xata.db.user_projects.update(project.id, { "ip": ip })
+            project.ip = ip as string;
+        }
+    }
+    // console.log("DB FETCHED !")
+    return project
+})
