@@ -1,7 +1,9 @@
+import { plans } from "@/constants";
 import { XataClient } from "@/xata";
 import { EC2Client, DescribeInstancesCommand } from "@aws-sdk/client-ec2";
 import { redirect } from "next/navigation";
 import { cache } from "react";
+import { ProjectSpecificDataType } from "@/types/types";
 
 export const credentials = {
     accessKeyId: process.env.AWS_ACCESS_KEY_ID as string,
@@ -52,3 +54,7 @@ export const initDash = cache(async (params: { project: string }) => {
     // console.log("DB FETCHED !")
     return project
 })
+
+export function getVMSpecs(vm: string) {
+    return plans.find(plan => plan.name === vm);
+}

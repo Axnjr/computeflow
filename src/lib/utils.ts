@@ -1,10 +1,11 @@
 import { ProjectConfigType } from "@/types/types";
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { plans } from "@/constants";
 
 export const timeStamp = () => {
 	return new Date().toLocaleString('en-US', {
-		month: 'long',
+		month: "short",
 		day: 'numeric',
 		hour: 'numeric',
 		minute: 'numeric',
@@ -83,6 +84,7 @@ export async function runCommandOnInstance(instanceIp: string | undefined, scrip
 	};
 
 	let runCommandAttempts = 1, response = "";
+
 	while(true){
 		console.log("Trying to run commnads on VM, attempt number:", runCommandAttempts)
 		try {
