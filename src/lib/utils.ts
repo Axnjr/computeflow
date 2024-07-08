@@ -64,14 +64,14 @@ export async function addProjectConfigToDatabase(projectConfig: ProjectConfigTyp
 }
 
 export async function runCommandOnInstance(instanceIp: string | undefined, scripts: string[]) {
+
 	if (!instanceIp) {
 		alert("INSTANCE-ID NOT FOUND !")
 		return "error"
 	}
-	// console.log("Currenly in utils", instanceIp, script)
+
 	const myHeaders = new Headers();
 	myHeaders.append("Content-Type", "application/json");
-
 	const requestOptions: RequestInit = {
 		method: "POST",
 		headers: myHeaders,
@@ -82,18 +82,58 @@ export async function runCommandOnInstance(instanceIp: string | undefined, scrip
 		redirect: "follow"
 	};
 
-	try {
-		let res = await fetch("/api/execute", requestOptions)
-		if (!res.ok) {
-			console.log("Error occurred executing commands: ", await res.json());
-			return `Unexpected error occurred!`;
+	let runCommandAttempts = 1, response = "";
+	while(true){
+		console.log("Trying to run commnads on VM, attempt number:", runCommandAttempts)
+		try {
+			let res = await fetch("/api/execute", requestOptions)
+			const commandsResponse = await res.json()
+			// server side error / ssh error //
+			if (!res.ok) { 
+				console.log("Error occurred executing commands: ", commandsResponse);
+				if(runCommandAttempts > 6){
+					response = `Some unexpected error occured, Tried ${runCommandAttempts} times !!`
+					break;
+				}
+				runCommandAttempts += 1;
+				await sleep(2000)
+				continue;
+			}
+			if(JSON.stringify(commandsResponse?.resultArray) === JSON.stringify([0,0,0,0])){
+				response = "Script excuted successfully check console for logs !"
+				break;
+			}
+			// script error //
+			else{ 
+				response = `error occured in ${logAnalyzer(commandsResponse?.resultArray)}`
+				break;
+			}
+		} 
+		// fetch error //
+		catch (error) { 
+			console.log("Fetch error: ", error);
+			if(runCommandAttempts > 6){
+				response = `Some unexpected error occured, Tried ${runCommandAttempts} times !!`
+				break;
+			}
+			runCommandAttempts += 1;
+			await sleep(2000)
+			continue;
 		}
-		return "Script excuted successfully check console for logs !"
-	} 
-	catch (error) {
-		console.log("Fetch error: ", error);
-		return `Failed to fetch`;
 	}
+	return response
+}
+
+function logAnalyzer(logArr: number[]){
+	const logs = ["VM Setup", "Clonning / pulling", "Building", "Running"]
+	let ans ;
+	for(let i = 0; i < logArr.length; i++){
+		if(logArr[i] != 0){
+			ans = i;
+			break;
+		}
+	}
+	return ans ? logs[ans] : "Something else";
 }
 
 export async function getVMStatus(instanceId: string) {
