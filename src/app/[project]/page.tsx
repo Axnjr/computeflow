@@ -11,50 +11,55 @@ export default function ProjectPage({ params, searchParams }: { params: { projec
 
 	const project = useProjectData()
 	const [logs, setLogs] = useState<string[]>(searchParams?.ts?.split("!") ?? [])
+	const [logsLoading, setLogsLoading] = useState(logs[logs.length - 1])
 
-	useEffect(() => {
-		async function initDeployment() {
-			let status = "under_deployment";
-			console.log(project.instance_metadata?.instanceId)
-			while(true){
-				console.log(status)
-				status = await getVMStatus(project.instance_metadata?.instanceId as string)
-				if(status == "running") break;
-				await sleep(3000);
-			}
-			setLogs(log => [...log, `,${timeStamp()} ◆ Connecting with VM !`])
-			runCommandOnInstance(
-				project.ip, 
-[
-`sudo yum update -y
-sudo yum install git -y
-sudo yum install nodejs -y npm`,  
+// 	useEffect(() => {
+// 		async function initDeployment() {
+// 			let status = "under_deployment";
+// 			console.log(project.instance_metadata?.instanceId)
+// 			while (true) {
+// 				console.log(status)
+// 				status = await getVMStatus(project.instance_metadata?.instanceId as string)
+// 				if (status == "running") break;
+// 				await sleep(3000);
+// 			}
+// 			setLogs(log => [...log, `,${timeStamp()} ◆ Connecting with VM !`])
+// 			runCommandOnInstance(
+// 				project.ip,
+// 				[
+// 					`sudo yum update -y
+// sudo yum install git -y
+// sudo yum install nodejs -y npm`,
 
-`sudo git clone -v ${project.deployed_from} ${project.id}/ec2`, 
+// 					`sudo git clone -v ${project.deployed_from} ${project.id}/ec2`,
 
-`cd ${project.id}/ec2
-sudo npm install
-sudo npm install -g forever`, 
+// 					`cd ${project.id}/ec2
+// sudo npm install
+// sudo npm install -g forever`,
 
-`sudo forever start --minUptime 5000 --spinSleepTime 2000 index.js`                 
-]
-			)
-			.then(res => {
-				setLogs(log => [...log, `,${timeStamp()} ◆ 🎊 Build Complete App running on your specified port 🎉🥳`])
-				console.log(logs)
-			})
-		}
+// 					`cd ${project.id}/ec2
+// sudo forever start --minUptime 5000 --spinSleepTime 2000 index.js`
+// 				])
+// 				.then(res => {
+// 					if (res.includes("error")) {
+// 						alert("Deployment failed !")
+// 						setLogs(log => [...log, `,${timeStamp()} ◆ ❌ Build failed 😰🤧`])
+// 					}
+// 					setLogs(log => [...log, `,${timeStamp()} ◆ 🎊 Build Complete App running on your specified port 🎉🥳`])
+// 					console.log(logs)
+// 				})
+// 		}
 
-		if(searchParams.ts && project.status == "under_deployment"){
-			setLogs([...logs, `,${timeStamp()} ◆ Waiting for Remote VM to catch up !`])
-			initDeployment()
-		}
-	}, [])
+// 		if (searchParams.ts && project.status == "under_deployment") {
+// 			setLogs([...logs, `,${timeStamp()} ◆ Waiting for Remote VM to catch up !`])
+// 			initDeployment()
+// 		}
+// 	}, [])
 
-	const channel = useChannel('project_ssh', 'log', (message) => {
-		console.log(message)
-		setLogs(log => [...log, `,${timeStamp()} ◆ ${message.data} !`])
-	});
+// 	useChannel('project_ssh', 'log', (message) => {
+// 		console.log(message)
+// 		setLogs(log => [...log, `,${timeStamp()} ◆ ${message.data} !`])
+// 	});
 
 	return (
 		<main className="h-screen w-full dark:bg-black bg-white dark:text-white text-black">
@@ -73,25 +78,31 @@ sudo npm install -g forever`,
 						<SelectItem value="30d">Last 30 days</SelectItem>
 					</SelectContent>
 				</Select>
-				<Button onClick={() => {
-					// channel.publish("test", "aya kay ??")
-					// getVMStatus("i-01772937d19798e69")
-					// .then(res => console.log(res))
-				}}>Execute</Button>
+				<Button>Execute</Button>
 			</div>
-			<div className="w-[95%] m-auto rounded-lg h-2/3 border border-neutral-300 dark:border-neutral-800
+			<div className="w-[95%] m-auto rounded-lg h-fit border border-neutral-300 dark:border-neutral-800
 			bg-black dark:bg-neutral-950 text-neutral-400 p-5">
 				{
 					logs.length > 0
 						?
-						logs.map((log: string, id) => {
-							let splitlog = log.split("◆")
-							return <div key={id} className="flex items-center justify-start text-base">
-								<p className="font-mono tracking-tighter">{splitlog[0].replace(",", "")}</p>&nbsp; {">>"} &nbsp;<p className="text-white font-bold">{splitlog[1]}</p>
-							</div>
-						})
+					logs.map((log: string, id) => {
+						let splitlog = log.split("◆")
+						return <div key={id} className="flex items-center justify-start text-base p-2 hover:bg-neutral-800 rounded-md">
+							<p className="font-mono tracking-tighter uppercase">{splitlog[0].replaceAll(",", "")}</p>
+								&nbsp;&nbsp; | &nbsp;&nbsp;
+							<p className="text-white font-bold text-sm">{splitlog[1]}</p>
+							{					
+								logsLoading == log ? <svg className="animate-spin size-3 text-white mx-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+									<circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3"></circle>
+									<path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+								</svg>
+									:
+								null
+							}
+						</div>
+					})
 						:
-						<></>
+					<></>
 				}
 			</div>
 		</main>
