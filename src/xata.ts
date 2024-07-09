@@ -85,6 +85,16 @@ const tables = [
       { name: "commands", type: "json" },
       { name: "env_variables", type: "string" },
     ],
+    revLinks: [{ column: "project", table: "project_deployments" }],
+  },
+  {
+    name: "project_deployments",
+    columns: [
+      { name: "project", type: "link", link: { table: "user_projects" } },
+      { name: "deployment_commit", type: "json" },
+      { name: "status", type: "string" },
+      { name: "message", type: "string" },
+    ],
   },
 ] as const;
 
@@ -114,6 +124,9 @@ export type NextauthUsersSessionsRecord = NextauthUsersSessions & XataRecord;
 export type UserProjects = InferredTypes["user_projects"];
 export type UserProjectsRecord = UserProjects & XataRecord;
 
+export type ProjectDeployments = InferredTypes["project_deployments"];
+export type ProjectDeploymentsRecord = ProjectDeployments & XataRecord;
+
 export type DatabaseSchema = {
   nextauth_users: NextauthUsersRecord;
   nextauth_accounts: NextauthAccountsRecord;
@@ -122,6 +135,7 @@ export type DatabaseSchema = {
   nextauth_sessions: NextauthSessionsRecord;
   nextauth_users_sessions: NextauthUsersSessionsRecord;
   user_projects: UserProjectsRecord;
+  project_deployments: ProjectDeploymentsRecord;
 };
 
 const DatabaseClient = buildClient();
