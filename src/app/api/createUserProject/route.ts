@@ -2,11 +2,12 @@ import { ProjectConfigType } from "@/types/types";
 import { NextRequest, NextResponse } from "next/server";
 import { XataClient } from "@/xata";
 
-export async function POST(req: NextRequest){
-    const projectConfig: ProjectConfigType = await req.json()
-    const xata = new XataClient();
+const xata = new XataClient();
 
-    console.log(projectConfig)
+export async function POST(req: NextRequest){
+
+    const projectConfig: ProjectConfigType = await req.json()
+    // console.log(projectConfig)
 
     try {
         const newUserProject = await xata.db.user_projects.create({
@@ -22,6 +23,7 @@ export async function POST(req: NextRequest){
             },
             status: "under_deployment"
         })
+       
         return NextResponse.json({projectId: newUserProject.id}, {status:200})
     } 
     catch (error) {
@@ -29,3 +31,23 @@ export async function POST(req: NextRequest){
         return NextResponse.json(error, { status: 500 })
     }
 }
+
+// export async function GET(req: NextRequest){
+//     const status = req?.nextUrl?.searchParams?.get("status")?.replace(/["\\/]/g, '');
+//     const message = req?.nextUrl?.searchParams?.get("message")?.replace(/["\\/]/g, '');
+//     const pid = req?.nextUrl?.searchParams?.get("pid")?.replace(/["\\/]/g, '');
+//     const commitId = req?.nextUrl?.searchParams?.get("cid")?.replace(/["\\/]/g, '');
+
+//     const dc = await fetch(`https://api.github.com/repos//cheapcloud/git/commits/3dff2048d1f0be7c65c3c431059bdde4e160b0cc`)
+
+//     if(pid && status){
+//         await xata.db.project_deployments.create({
+//             project:{id: pid },
+//             status: "under_deployment",
+//             message: "",
+//             deployment_commit:{
+    
+//             }
+//         })
+//     }
+// }
