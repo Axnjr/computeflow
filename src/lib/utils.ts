@@ -64,13 +64,16 @@ export async function addProjectConfigToDatabase(projectConfig: ProjectConfigTyp
 	return res?.projectId
 }
 
-export async function runCommandOnInstance(instanceIp: string | undefined, scripts: string[]) {
+export async function addProjectDeployments(){
+	
+}
 
+export async function runCommandOnInstance(instanceIp: string | undefined, scripts: string[]) {
+	// alert("EXECUTING COMMANDS !!")
 	if (!instanceIp) {
 		alert("INSTANCE-ID NOT FOUND !")
 		return "error"
 	}
-
 	const myHeaders = new Headers();
 	myHeaders.append("Content-Type", "application/json");
 	const requestOptions: RequestInit = {
@@ -89,25 +92,28 @@ export async function runCommandOnInstance(instanceIp: string | undefined, scrip
 		console.log("Trying to run commnads on VM, attempt number:", runCommandAttempts)
 		try {
 			let res = await fetch("/api/execute", requestOptions)
-			const commandsResponse = await res.json()
+			// console.log("RESPONSE 00000000000000000000000000000000>>", res)
+			
 			// server side error / ssh error //
-			if (!res.ok) { 
-				console.log("Error occurred executing commands: ", commandsResponse);
-				if(runCommandAttempts > 6){
-					response = `Some unexpected error occured, Tried ${runCommandAttempts} times !!`
-					break;
-				}
-				runCommandAttempts += 1;
-				await sleep(2000)
-				continue;
-			}
+			// if (!res.ok) { 
+			// 	console.log("Error occurred executing commands: ");
+			// 	if(runCommandAttempts > 6){
+			// 		response = `Some unexpected error occured, Tried ${runCommandAttempts} times !!`
+			// 		break;
+			// 	}
+			// 	runCommandAttempts += 1;
+			// 	await sleep(2000)
+			// 	continue;
+			// }
+			const commandsResponse = await JSON.parse(res)
+			console.log("RES::::: ----------===========>> ",commandsResponse)
 			if(JSON.stringify(commandsResponse?.resultArray) === JSON.stringify([0,0,0,0])){
 				response = "Script excuted successfully check console for logs !"
 				break;
 			}
 			// script error //
 			else{ 
-				response = `error occured in ${logAnalyzer(commandsResponse?.resultArray)}`
+				response = `error`
 				break;
 			}
 		} 
@@ -127,7 +133,7 @@ export async function runCommandOnInstance(instanceIp: string | undefined, scrip
 }
 
 function logAnalyzer(logArr: number[]){
-	const logs = ["VM Setup", "Clonning / pulling", "Building", "Running"]
+	const logs = ["Seting up VM", "Clonning / pulling project", "Running Build commands", "Running start cammand"]
 	let ans ;
 	for(let i = 0; i < logArr.length; i++){
 		if(logArr[i] != 0){
@@ -146,4 +152,16 @@ export async function getVMStatus(instanceId: string) {
 	}
 	let r = await res.json()
 	return r?.Name
+}
+
+export async function pollForVmStatus(instanceId: string){
+	let status = "under_deployment";
+	console.log(instanceId)
+	while (true) {
+		console.log(status)
+		status = await getVMStatus(instanceId)
+		if (status == "running") break;
+		await sleep(3000);
+	}
+	return status
 }
