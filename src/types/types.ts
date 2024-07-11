@@ -8,7 +8,15 @@ export interface ProjectSpecificDataType {
     deployed_from: string,
     xata?: xata,
     instance_metadata?: Compute,
-    commands?: Commands
+    commands?: Commands,
+    user?: user
+}
+
+type user = {
+    id: string,
+    name?: string,
+    email?: string,
+    image?: string
 }
 
 type xata = {
@@ -65,4 +73,19 @@ export const dummyProjectConfig: ProjectConfigType = {
         // instanceId:''
     },
     env:""
+}
+
+export type DeploymentCommit = {
+    commitId: string,
+    commitMessage: string
+    commitUrl: string
+}
+
+export type DeploymentData = {
+    pid: string,
+    deploymentsCommits: DeploymentCommit,
+    userName: string,
+    projectName: string,
+    status: string,
+    message: string
 }
