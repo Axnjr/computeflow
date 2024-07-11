@@ -35,7 +35,7 @@ export async function getIpAddress(instanceId: string | undefined){
 }
 
 export const initDash = cache(async (params: { project: string }) => {
-    // console.log("PARAMS:   ====> ",params)
+    console.log("PARAMS:   ====> ",params)
     const xata = new XataClient();
     let res: unknown = await xata.db.user_projects.filter({ id: params.project }).getFirst()
 
