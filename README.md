@@ -8,4 +8,10 @@
 Small side project comming soon. 
 </div>
 
-# A cheaper alternative to Render and other AWS wrappers. Effortlessly deploy, scale & manage your docker containers or git repositories.
+# A cheaper alternative to "Render" and other AWS wrappers. Effortlessly deploy, scale & manage your docker containers or git repositories.
+
+#### Better Than 😎🤙:
+- [Render](https://render.com/)
+- [Railway](https://railway.app/)
+- [Heroku](https://www.heroku.com/)
+- Etc ..
