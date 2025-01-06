@@ -92,20 +92,18 @@ export async function runCommandOnInstance(instanceIp: string | undefined, scrip
 		console.log("Trying to run commnads on VM, attempt number:", runCommandAttempts)
 		try {
 			let res = await fetch("/api/execute", requestOptions)
-			// console.log("RESPONSE 00000000000000000000000000000000>>", res)
-			
 			// server side error / ssh error //
-			// if (!res.ok) { 
-			// 	console.log("Error occurred executing commands: ");
-			// 	if(runCommandAttempts > 6){
-			// 		response = `Some unexpected error occured, Tried ${runCommandAttempts} times !!`
-			// 		break;
-			// 	}
-			// 	runCommandAttempts += 1;
-			// 	await sleep(2000)
-			// 	continue;
-			// }
-			const commandsResponse = await JSON.parse(res)
+			if (!res.ok) { 
+				console.log("Error occurred executing commands: ");
+				if(runCommandAttempts > 6){
+					response = `Some unexpected error occured, Tried ${runCommandAttempts} times !!`
+					break;
+				}
+				runCommandAttempts += 1;
+				await sleep(2000)
+				continue;
+			}
+			const commandsResponse = await JSON.parse(await res.text())
 			console.log("RES::::: ----------===========>> ",commandsResponse)
 			if(JSON.stringify(commandsResponse?.resultArray) === JSON.stringify([0,0,0,0])){
 				response = "Script excuted successfully check console for logs !"
