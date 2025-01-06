@@ -1,65 +1,93 @@
 "use client";
-// import { Button } from "@/components/ui/button";
-import { runCommandOnInstance, getVMStatus, sleep, timeStamp } from "@/lib/utils";
+import { runCommandOnInstance, pollForVmStatus, sleep, timeStamp } from "@/lib/utils";
 import { useProjectData } from "@/providers/projectDataProvider";
 import { useEffect, useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button";
 import { useChannel } from 'ably/react';
+import { useRouter } from "next/navigation";
 
-export default function ProjectPage({ params, searchParams }: { params: { project: string }, searchParams: { [key: string]: string | undefined } }) {
+export default function ProjectPage({ params, searchParams }:{ params: { project: string }, searchParams: { [key: string]: string | undefined } }) {
 
 	const project = useProjectData()
+	const router = useRouter()
 	const [logs, setLogs] = useState<string[]>(searchParams?.ts?.split("!") ?? [])
 	const [logsLoading, setLogsLoading] = useState(logs[logs.length - 1])
+	const userName = project.deployed_from?.replace("https://github.com/", "").split("/")[0];
 
-// 	useEffect(() => {
-// 		async function initDeployment() {
-// 			let status = "under_deployment";
-// 			console.log(project.instance_metadata?.instanceId)
-// 			while (true) {
-// 				console.log(status)
-// 				status = await getVMStatus(project.instance_metadata?.instanceId as string)
-// 				if (status == "running") break;
-// 				await sleep(3000);
-// 			}
-// 			setLogs(log => [...log, `,${timeStamp()} ◆ Connecting with VM !`])
-// 			runCommandOnInstance(
-// 				project.ip,
-// 				[
-// 					`sudo yum update -y
-// sudo yum install git -y
-// sudo yum install nodejs -y npm`,
+	function initiateLogUpdate(log: string) {
+		setLogs([...logs, log])
+		setLogsLoading(log)
+		// router.push(log)
+	}
 
-// 					`sudo git clone -v ${project.deployed_from} ${project.id}/ec2`,
+	useEffect(() => {
+		async function initDeployment() {
 
-// 					`cd ${project.id}/ec2
-// sudo npm install
-// sudo npm install -g forever`,
+			await pollForVmStatus(project.instance_metadata?.instanceId as string)
+			// await sleep(2000)
 
-// 					`cd ${project.id}/ec2
-// sudo forever start --minUptime 5000 --spinSleepTime 2000 index.js`
-// 				])
-// 				.then(res => {
-// 					if (res.includes("error")) {
-// 						alert("Deployment failed !")
-// 						setLogs(log => [...log, `,${timeStamp()} ◆ ❌ Build failed 😰🤧`])
-// 					}
-// 					setLogs(log => [...log, `,${timeStamp()} ◆ 🎊 Build Complete App running on your specified port 🎉🥳`])
-// 					console.log(logs)
-// 				})
-// 		}
+			initiateLogUpdate(`,${timeStamp()} ◆ Connecting with VM !`)
 
-// 		if (searchParams.ts && project.status == "under_deployment") {
-// 			setLogs([...logs, `,${timeStamp()} ◆ Waiting for Remote VM to catch up !`])
-// 			initDeployment()
-// 		}
-// 	}, [])
+			// await sleep(2000)
+			const response = await runCommandOnInstance(
+				project.ip,
+				[
+					`sudo yum update -y
+sudo yum install git -y
+sudo yum install nodejs -y npm`,
 
-// 	useChannel('project_ssh', 'log', (message) => {
-// 		console.log(message)
-// 		setLogs(log => [...log, `,${timeStamp()} ◆ ${message.data} !`])
-// 	});
+					`sudo git clone -v ${project.deployed_from} ${project.id}/ec2`,
+
+					`cd ${project.id}/ec2
+sudo npm install
+sudo npm install -g forever`,
+
+					`cd ${project.id}/ec2
+sudo forever start --minUptime 5000 --spinSleepTime 2000 index.js`
+			])
+
+			if (response.includes("error")) {
+				alert("Deployment failed !")
+				initiateLogUpdate(`,${timeStamp()} ◆ ❌ Build failed 😰🤧`)
+			}
+
+			initiateLogUpdate(`,${timeStamp()} ◆ 🎊 Build Complete App running on your specified port 🎉🥳`)
+
+			const latestCommit = await (await fetch(
+				`https://api.github.com/repos/${userName}/${project.project_name}/commits?per_page=1`
+			)).json()
+
+			await fetch(`/api/createDeployment`, {
+				method:"POST",
+				body: JSON.stringify({
+					pid: project.id,
+					status: response.includes("error") ? "Failed" : "Deployed",
+					message: response,
+					userName: userName,
+					projectName: project.project_name,
+					deploymentsCommits: {
+						commitId: latestCommit[0]?.sha,
+						commitMessage: latestCommit[0].commit?.message,
+						commitUrl: latestCommit[0].html_url
+					}
+				})
+			})
+			setLogsLoading("");
+		}
+
+		if (searchParams.ts && project.status == "under_deployment") {
+			initiateLogUpdate(`,${timeStamp()} ◆ Waiting for Remote VM to catch up !`)
+			initDeployment()
+		}
+		else{
+
+		}
+	}, [])
+
+	useChannel('project_ssh', 'log', (message) => {
+		initiateLogUpdate(`,${timeStamp()} ◆ ${message.data} !`)
+	});
 
 	return (
 		<main className="h-screen w-full dark:bg-black bg-white dark:text-white text-black">
@@ -102,7 +130,7 @@ export default function ProjectPage({ params, searchParams }: { params: { projec
 						</div>
 					})
 						:
-					<></>
+					<>{JSON.stringify(project)}</>
 				}
 			</div>
 		</main>
