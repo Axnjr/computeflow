@@ -9,7 +9,7 @@ import ProjectConfig from '@/components/projectConfig';
 import SelectCompute from '@/components/selectCompute';
 import EnvVariable from '@/components/envVariable';
 import { ProjectConfigType, dummyProjectConfig } from '@/types/types';
-import { addProjectConfigToDatabase, deployInstance, timeStamp, runCommandOnInstance, sleep } from '@/lib/utils';
+import { addProjectConfigToDatabase, deployInstance, timeStamp, sleep } from '@/lib/utils';
 import { useSession } from 'next-auth/react';
 
 export default function DeployViaGithub() {
@@ -53,13 +53,23 @@ export default function DeployViaGithub() {
         pro.current.commands.startCommand = document.getElementById("startcommandinputfeild").value.replace("node", "start")
         // @ts-ignore
         pro.current.env = document.getElementById("envvariblesinputfeild").value
+
+        // -- COMMENTED LINE TO BE CHANGED -- //
+        // -- COMMENTED LINE TO BE CHANGED -- //
+        // -- COMMENTED LINE TO BE CHANGED -- //
+
         pro.current.compute.instanceId = await deployInstance(pro.current)
-        // await sleep(500)
+        // await sleep(1)
         timeStampLogs.push(`${timeStamp()} ◆ Compute VM located in region - ${pro.current.region} !`)
         let pid = await addProjectConfigToDatabase(pro.current);
-        // await sleep(1000)
+        // await sleep(1)
         timeStampLogs.push(`${timeStamp()} ◆ Storing project config`)
         router.push(`/${pid}?ts=${timeStampLogs.join()}`)
+        // router.push(`/${"rec_cpq16rct216nqumbqt4g"}?ts=${timeStampLogs.join()}`)
+
+        // -- COMMENTED LINE TO BE CHANGED -- //
+        // -- COMMENTED LINE TO BE CHANGED -- //
+        // -- COMMENTED LINE TO BE CHANGED -- //
     }
 
     let name = repos[0]?.url?.replace("https://github.com/", "").split("/")[0];
